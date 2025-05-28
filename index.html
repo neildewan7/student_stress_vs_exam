@@ -2,96 +2,89 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam Stress Visualization</title>
-    <link rel="stylesheet" href="style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam Stress Visualization</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
+  <!-- 1. Hero Section -->
+  <header class="hero">
+    <h1>Stress Signals: How Physiology Reflects Academic Pressure</h1>
+    <p class="subtitle">Explore how wearable data reveals student stress during exams</p>
+    <p class="authors">By Jessica Jiaxin, Neil, Alex, Seichii</p>
+  </header>
 
-    <!-- 1. Hero Section -->
-    <header class="hero">
-        <h1>Stress Signals: How Physiology Reflects Academic Pressure</h1>
-        <p class="subtitle">Explore how wearable data reveals student stress during exams</p>
-        <p class="authors">By Jessica Jiaxin, Neil, Alex, Seichii</p>
-    </header>
+  <!-- 2. Introduction -->
+  <section id="intro" class="section">
+    <h2>Project Overview</h2>
+    <p>This project visualizes real-world stress responses using wearable physiological data collected during midterms and finals. By analyzing heart rate, electrodermal activity, and other signals, we uncover how cognitive stress affects students under pressure.</p>
+  </section>
 
-    <!-- 2. Introduction -->
-    <section id="intro" class="section">
-        <h2>Project Overview</h2>
-        <p>This project visualizes real-world stress responses using wearable physiological data collected during midterms and finals. By analyzing heart rate, electrodermal activity, and other signals, we uncover how cognitive stress affects students under
-            pressure.
-        </p>
-    </section>
+  <!-- 3. Visualization Section -->
+  <section id="visualization" class="section">
+    <h2>Interactive Visualizations</h2>
 
-    <!-- 3. Visualization Section -->
-    <section id="visualization" class="section">
-        <h2>Interactive Visualization</h2>
+    <!-- A. Time-Series Graph -->
+    <div class="chart-block">
+      <h3>Heart Rate Over Time</h3>
+      <p>Select a group to view average heart rate patterns across exams.</p>
+      <div class="controls">
+        <label for="hr-measure">Group:</label>
+        <select id="hr-measure"></select>
+      </div>
+      <div id="hr-chart"></div>
+      <div class="tooltip"></div>
+    </div>
 
-        <!-- A. Time-Series Graph -->
-        <div class="chart-block">
-            <h3>Heart Rate Over Time</h3>
-            <p>Select a group to view average heart rate patterns across exams.</p>
-            <div class="controls">
-                <label for="measure">Group:</label>
-                <select id="measure"></select>
-            </div>
-            <div id="chart"></div>
-            <div class="tooltip"></div>
-        </div>
+    <!-- B. Scatterplot Graph -->
+    <div class="chart-block">
+      <h3>Signal Strength vs Exam Score</h3>
+      <p>Select an exam to see the correlation between average signal level and performance.</p>
+      <div class="controls">
+        <label for="exam-measure">Exam:</label>
+        <select id="exam-measure"></select>
+      </div>
+      <div id="score-chart"></div>
+      <div class="tooltip"></div>
+    </div>
+  </section>
 
-        <!-- (Optional) B. Signal vs Performance -->
-        <div class="chart-block">
-            <h3>Signal vs Exam Performance (optional)</h3>
-            <p>A scatterplot that could show correlation between average signal values and final exam scores.</p>
-            <div id="scatter"></div>
-        </div>
+  <!-- 4. Key Insights -->
+  <section id="insights" class="section">
+    <h2>What We Learned</h2>
+    <ul>
+      <li>Heart rate tends to spike just before the end of each exam.</li>
+      <li>Female students showed greater variability in EDA during finals.</li>
+      <li>Stress patterns differ more by individual than by exam type.</li>
+    </ul>
+  </section>
 
-        <!-- (Optional) C. Individual Student Timeline -->
-        <div class="chart-block">
-            <h3>Student Stress Storyline (optional)</h3>
-            <p>Select a student to follow their physiological journey through each exam.</p>
-            <div id="student-select"></div>
-            <div id="student-timeline"></div>
-        </div>
-    </section>
+  <!-- 5. Dataset & Methods -->
+  <section id="methods" class="section">
+    <h2>Dataset & Methodology</h2>
+    <p>We used the <a href="https://physionet.org/content/wearable-exam-stress/1.0.0/" target="_blank">Wearable Exam Stress Dataset</a> from PhysioNet. Signals were aggregated and cleaned using Python, then visualized with D3.js. Preprocessing involved resampling, timestamp conversion, and grouping by student and exam session.</p>
+  </section>
 
-    <!-- 4. Key Insights -->
-    <section id="insights" class="section">
-        <h2>What We Learned</h2>
-        <ul>
-            <li>Heart rate tends to spike just before the end of each exam.</li>
-            <li>Female students showed greater variability in EDA during finals.</li>
-            <li>Stress patterns differ more by individual than by exam type.</li>
-        </ul>
-    </section>
+  <!-- 6. About the Team -->
+  <section id="team" class="section">
+    <h2>About the Team</h2>
+    <p>We are a group of students passionate about data storytelling. This project was built collaboratively as part of our final visualization course assignment.</p>
+  </section>
 
-    <!-- 5. Dataset & Methods -->
-    <section id="methods" class="section">
-        <h2>Dataset & Methodology</h2>
-        <p>We used the <a href="https://physionet.org/content/wearable-exam-stress/1.0.0/" target="_blank">Wearable Exam Stress Dataset</a> from PhysioNet. Signals were aggregated and cleaned using Python, then visualized with D3.js. Preprocessing involved
-            resampling, timestamp conversion, and grouping by student and exam session.</p>
-    </section>
+  <!-- 7. Footer -->
+  <footer class="footer">
+    <p>© 2025 | Team Jessica Jiaxin He • <a href="https://github.com/hjxhh030315?tab=repositories">GitHub Repo</a></p>
+    <p>© 2025 | Team Neil • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
+    <p>© 2025 | Team Alex • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
+    <p>© 2025 | Team Seichii • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
+  </footer>
 
-    <!-- 6. About the Team -->
-    <section id="team" class="section">
-        <h2>About the Team</h2>
-        <p>We are a group of students passionate about data storytelling. This project was built collaboratively as part of our final visualization course assignment.</p>
-    </section>
-
-    <!-- 7. Footer -->
-    <footer class="footer">
-        <p>© 2025 | Team Jessica Jiaxin He • <a href="https://github.com/hjxhh030315?tab=repositories">GitHub Repo</a></p>
-        <p>© 2025 | Team Neil • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
-        <p>© 2025 | Team Alex • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
-        <p>© 2025 | Team Seichii • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="script.js"></script>
+  <!-- Scripts -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>
