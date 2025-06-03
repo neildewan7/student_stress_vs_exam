@@ -120,7 +120,6 @@ d3.csv("hr_summary_by_minute.csv").then(data => {
         update(this.value);
     });
 });
-
 // --- Signal vs Exam Score Scatterplot ---
 d3.csv("merged_signal_grades.csv").then(data => {
     data.forEach(d => {
@@ -152,32 +151,79 @@ d3.csv("merged_signal_grades.csv").then(data => {
     svg.append("g")
         .attr("class", "y-axis");
 
-    const tooltip = d3.select(".tooltip");
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip");
 
     const color = d3.scaleOrdinal()
-        .domain(["HR", "EDA", "BVP", "TEMP"])
-        .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3"]);
+        .domain(["midterm1", "midterm2", "final"])
+        .range(["#1f77b4", "#ff7f0e", "#2ca02c"]);
 
-    function update(selectedExam) {
-        const filtered = data.filter(d => d.exam === selectedExam);
+    const signals = [...new Set(data.map(d => d.signal))];
+    const exams = [...new Set(data.map(d => d.exam))];
+
+    // Dropdown for signal
+    const signalDropdown = d3.select("#score-chart")
+        .insert("div", ":first-child")
+        .attr("class", "controls")
+        .html('<label for="signal-dropdown">Signal:</label> ')
+        .append("select")
+        .attr("id", "signal-dropdown");
+
+    signalDropdown.selectAll("option")
+        .data(signals)
+        .enter()
+        .append("option")
+        .text(d => d)
+        .attr("value", d => d);
+
+    // Checkbox group for exams
+    const examControls = d3.select("#score-chart")
+        .insert("div", ":first-child")
+        .attr("class", "controls")
+        .attr("id", "exam-checkboxes");
+
+    exams.forEach(exam => {
+        const label = examControls.append("label").style("margin-right", "12px");
+        label.append("input")
+            .attr("type", "checkbox")
+            .attr("value", exam)
+            .property("checked", true);
+        label.append("span").text(` ${exam}`);
+    });
+
+    function update() {
+        const selectedSignal = d3.select("#signal-dropdown").property("value");
+        const selectedExams = Array.from(document.querySelectorAll("#exam-checkboxes input:checked")).map(d => d.value);
+
+        const filtered = data.filter(d => d.signal === selectedSignal && selectedExams.includes(d.exam));
 
         x.domain(d3.extent(filtered, d => d.avg_value)).nice();
-        y.domain(d3.extent(filtered, d => d.exam_score)).nice();
+
+        // Set yMax manually based on exam types
+        let yMax = 100;
+        if (selectedExams.includes("final") || selectedExams.length === 3) {
+            yMax = 200;
+        }
+
+        y.domain([0, yMax]);
 
         svg.select(".x-axis")
             .transition().duration(500)
-            .call(xAxis.tickFormat(d => `${d / 1000}k`))
+            .call(xAxis)
             .select(".x-axis-label").remove();
 
         svg.select(".x-axis").append("text")
             .attr("class", "x-axis-label")
             .attr("x", width / 2)
             .attr("y", 40)
+            .style("text-anchor", "middle")
             .text("Average Signal Level");
 
         svg.select(".y-axis")
             .transition().duration(500)
-            .call(yAxis)
+            .call(
+                yAxis.ticks(yMax === 200 ? 10 : 5)
+            )
             .select(".y-axis-label").remove();
 
         svg.select(".y-axis").append("text")
@@ -185,10 +231,11 @@ d3.csv("merged_signal_grades.csv").then(data => {
             .attr("transform", "rotate(-90)")
             .attr("y", -50)
             .attr("dy", ".71em")
+            .style("text-anchor", "middle")
             .text("Exam Score");
 
         const circles = svg.selectAll(".point")
-            .data(filtered, d => d.student + d.signal);
+            .data(filtered, d => d.student + d.signal + d.exam);
 
         circles.exit().remove();
 
@@ -200,7 +247,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
             .on("mouseover", function (event, d) {
                 tooltip
                     .style("opacity", 1)
-                    .html(`Student: ${d.student}<br>Signal: ${d.signal}<br>Score: ${d.exam_score}`)
+                    .html(`Student: ${d.student}<br>Signal: ${d.signal}<br>Exam: ${d.exam}<br>Score: ${d.exam_score}`)
                     .style("left", `${event.pageX + 10}px`)
                     .style("top", `${event.pageY - 28}px`);
             })
@@ -211,20 +258,11 @@ d3.csv("merged_signal_grades.csv").then(data => {
             .attr("cx", d => x(d.avg_value))
             .attr("cy", d => y(d.exam_score))
             .attr("r", 6)
-            .attr("fill", d => color(d.signal));
+            .attr("fill", d => color(d.exam));
     }
 
-    const exams = [...new Set(data.map(d => d.exam))];
-    d3.select("#exam-measure")
-        .selectAll("option")
-        .data(exams)
-        .join("option")
-        .text(d => d)
-        .attr("value", d => d);
+    d3.select("#signal-dropdown").on("change", update);
+    d3.selectAll("#exam-checkboxes input").on("change", update);
 
-    update(exams[0]);
-
-    d3.select("#exam-measure").on("change", function () {
-        update(this.value);
-    });
+    update();
 });
