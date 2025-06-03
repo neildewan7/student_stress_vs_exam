@@ -127,7 +127,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
         d.exam_score = +d.exam_score;
     });
 
-    const margin = { top: 30, right: 60, bottom: 50, left: 60 },
+    const margin = { top: 30, right: 60, bottom: 50, left: 80 },
         width = 800 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
@@ -155,7 +155,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
         .attr("class", "tooltip");
 
     const color = d3.scaleOrdinal()
-        .domain(["midterm1", "midterm2", "final"])
+        .domain(["Midterm 1", "Midterm 2", "Final"])
         .range(["#1f77b4", "#ff7f0e", "#2ca02c"]);
 
     const signals = [...new Set(data.map(d => d.signal))];
@@ -165,7 +165,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
     const signalDropdown = d3.select("#score-chart")
         .insert("div", ":first-child")
         .attr("class", "controls")
-        .html('<label for="signal-dropdown">Signal:</label> ')
+        .html('<label for="signal-dropdown">Signal:</label>')
         .append("select")
         .attr("id", "signal-dropdown");
 
@@ -183,7 +183,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
         .attr("id", "exam-checkboxes");
 
     exams.forEach(exam => {
-        const label = examControls.append("label").style("margin-right", "12px");
+        const label = examControls.append("label");
         label.append("input")
             .attr("type", "checkbox")
             .attr("value", exam)
@@ -197,40 +197,35 @@ d3.csv("merged_signal_grades.csv").then(data => {
 
         const filtered = data.filter(d => d.signal === selectedSignal && selectedExams.includes(d.exam));
 
+        // Adjust y-axis range depending on selected exams
+        const useMax200 = selectedExams.includes("Final") || selectedExams.length === 3;
+        y.domain([0, useMax200 ? 200 : 100]);
+
         x.domain(d3.extent(filtered, d => d.avg_value)).nice();
-
-        // Set yMax manually based on exam types
-        let yMax = 100;
-        if (selectedExams.includes("final") || selectedExams.length === 3) {
-            yMax = 200;
-        }
-
-        y.domain([0, yMax]);
 
         svg.select(".x-axis")
             .transition().duration(500)
-            .call(xAxis)
-            .select(".x-axis-label").remove();
-
-        svg.select(".x-axis").append("text")
-            .attr("class", "x-axis-label")
-            .attr("x", width / 2)
-            .attr("y", 40)
-            .style("text-anchor", "middle")
-            .text("Average Signal Level");
+            .call(xAxis);
 
         svg.select(".y-axis")
             .transition().duration(500)
-            .call(
-                yAxis.ticks(yMax === 200 ? 10 : 5)
-            )
-            .select(".y-axis-label").remove();
+            .call(yAxis);
 
-        svg.select(".y-axis").append("text")
+        // Remove old labels and add new ones
+        svg.select(".x-axis-label").remove();
+        svg.append("text")
+            .attr("class", "x-axis-label")
+            .attr("x", width / 2)
+            .attr("y", height + 40)
+            .style("text-anchor", "middle")
+            .text("Average Signal Level");
+
+        svg.select(".y-axis-label").remove();
+        svg.append("text")
             .attr("class", "y-axis-label")
             .attr("transform", "rotate(-90)")
+            .attr("x", -height / 2)
             .attr("y", -50)
-            .attr("dy", ".71em")
             .style("text-anchor", "middle")
             .text("Exam Score");
 
@@ -247,7 +242,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
             .on("mouseover", function (event, d) {
                 tooltip
                     .style("opacity", 1)
-                    .html(`Student: ${d.student}<br>Signal: ${d.signal}<br>Exam: ${d.exam}<br>Score: ${d.exam_score}`)
+                    .html(`Student: ${d.student}<br>Exam: ${d.exam}<br>Score: ${d.exam_score}<br>Signal Value: ${d.avg_value.toFixed(2)}`)
                     .style("left", `${event.pageX + 10}px`)
                     .style("top", `${event.pageY - 28}px`);
             })
