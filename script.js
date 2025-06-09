@@ -94,6 +94,25 @@ d3.csv("hr_summary_by_minute.csv").then(data => {
             .attr("stroke-width", 2.5)
             .attr("d", line);
 
+        svg.append("path")
+            .datum(filtered)
+            .attr("class", "line-path")
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2.5)
+            .attr("d", line)
+            .attr("stroke-dasharray", function() {
+                const totalLength = this.getTotalLength();
+                return `${totalLength} ${totalLength}`;
+            })
+            .attr("stroke-dashoffset", function() {
+                return this.getTotalLength();
+            })
+            .transition()
+            .duration(1000)
+            .attr("stroke-dashoffset", 0);
+
+
         const focus = svg.append("circle")
             .attr("class", "focus-dot")
             .attr("r", 4)
