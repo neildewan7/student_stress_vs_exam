@@ -252,8 +252,7 @@ d3.csv("merged_signal_grades.csv").then(data => {
         const filtered = data.filter(d => d.signal === selectedSignal && selectedExams.includes(d.exam));
 
         // Adjust y-axis range depending on selected exams
-        const useMax200 = selectedExams.includes("Final") || selectedExams.length === 3;
-        y.domain([0, useMax200 ? 200 : 100]);
+        y.domain([0, 100]);
 
         x.domain(d3.extent(filtered, d => d.avg_value)).nice();
 
