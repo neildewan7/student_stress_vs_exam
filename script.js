@@ -1102,7 +1102,7 @@ function analyzeClusterArchetypes(features, clusters) {
         archetypeName = usedNames.has("Volatile Responder")
           ? "Stress Fluctuator"
           : "Volatile Responder";
-        icon = usedNames.has("Volatile Responder") ? "🌊" : "��";
+        icon = usedNames.has("Volatile Responder") ? "🌊" : "⚡";
         description =
           archetypeName === "Stress Fluctuator"
             ? "Shows irregular stress patterns with unpredictable fluctuations."
@@ -1487,6 +1487,20 @@ function createArchetypePatternChart(archetype) {
 function updateMLInsights(results) {
   document.getElementById("ml-insight-patterns").textContent =
     results.archetypes.length;
+
+  // Update the insights description with current language
+  const patternsDescElement = document.querySelector(
+    '[data-i18n="patterns.insights.patternsDesc"]',
+  );
+  if (patternsDescElement) {
+    const template = getTranslation("patterns.insights.patternsDesc");
+    if (template) {
+      patternsDescElement.innerHTML = template.replace(
+        "{count}",
+        `<span id="ml-insight-patterns">${results.archetypes.length}</span>`,
+      );
+    }
+  }
 }
 
 // Stress Quiz Functions
@@ -1590,13 +1604,15 @@ function initializeAlgorithmToggle() {
     if (isActive) {
       content.classList.remove("active");
       arrow.classList.remove("rotated");
-      toggleButton.querySelector(".toggle-text").textContent =
-        "How Does The Algorithm Work?";
+      toggleButton.querySelector(".toggle-text").textContent = getTranslation(
+        "patterns.algorithmToggle",
+      );
     } else {
       content.classList.add("active");
       arrow.classList.add("rotated");
-      toggleButton.querySelector(".toggle-text").textContent =
-        "Hide Algorithm Explanation";
+      toggleButton.querySelector(".toggle-text").textContent = getTranslation(
+        "patterns.algorithmHide",
+      );
     }
   });
 }
