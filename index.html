@@ -28,6 +28,7 @@
       <button class="nav-btn" data-section="visualization">
         Data Explorer
       </button>
+      <button class="nav-btn" data-section="ml-analysis">🤖 ML Analysis</button>
       <button class="nav-btn" data-section="insights">Insights</button>
     </nav>
 
@@ -148,6 +149,181 @@
         </p>
         <div id="score-chart"></div>
         <div class="tooltip"></div>
+      </div>
+    </section>
+
+    <section id="ml-analysis" class="section">
+      <h2>🤖 AI-Powered Stress Pattern Analysis</h2>
+      <p class="section-intro">
+        Using machine learning to discover hidden patterns in how different
+        students experience stress during exams. Our clustering algorithm
+        identifies distinct "stress archetypes" based on physiological
+        responses.
+      </p>
+
+      <div class="ml-controls">
+        <div class="algorithm-info">
+          <h3>How It Works</h3>
+          <p>
+            We use <strong>K-means clustering</strong> to group students based
+            on their heart rate patterns during exams. The algorithm analyzes
+            temporal features like stress build-up rate, peak stress timing, and
+            recovery patterns.
+          </p>
+        </div>
+
+        <div class="analysis-controls">
+          <label for="cluster-count">Number of Stress Types:</label>
+          <select id="cluster-count">
+            <option value="3">3 Types</option>
+            <option value="4" selected>4 Types</option>
+            <option value="5">5 Types</option>
+          </select>
+          <button id="run-clustering" class="ml-btn">
+            🔄 Analyze Patterns
+          </button>
+        </div>
+      </div>
+
+      <div id="clustering-results" class="clustering-results">
+        <div class="results-header">
+          <h3>Discovered Stress Archetypes</h3>
+          <p>
+            Click on any archetype to explore the students who exhibit this
+            pattern:
+          </p>
+        </div>
+
+        <div id="archetype-cards" class="archetype-cards">
+          <!-- Archetype cards will be generated here -->
+        </div>
+
+        <div class="ml-visualizations">
+          <div class="viz-container">
+            <h4>Stress Pattern Comparison</h4>
+            <div id="pattern-comparison-chart"></div>
+          </div>
+
+          <div class="viz-container">
+            <h4>Student Distribution by Archetype</h4>
+            <div id="archetype-distribution-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="archetype-detail" class="archetype-detail">
+        <!-- Detailed archetype analysis will appear here -->
+      </div>
+
+      <div class="ml-insights">
+        <h3>Key ML Insights</h3>
+        <div class="insight-grid">
+          <div class="ml-insight-card">
+            <div class="insight-icon">🔬</div>
+            <h4>Pattern Discovery</h4>
+            <p>
+              Machine learning revealed
+              <span id="ml-insight-patterns">4</span> distinct stress response
+              patterns that weren't obvious from individual analysis.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">⏱️</div>
+            <h4>Temporal Features</h4>
+            <p>
+              The strongest differentiating factor is
+              <strong>when</strong> during the exam stress peaks occur, not just
+              the intensity.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">👥</div>
+            <h4>Student Clustering</h4>
+            <p>
+              Students with similar stress patterns often show different
+              performance outcomes, confirming stress doesn't predict grades.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">🎯</div>
+            <h4>Personalization</h4>
+            <p>
+              Understanding your stress archetype could help develop
+              personalized stress management strategies.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ml-quiz">
+        <h3>🎮 What's Your Stress Archetype?</h3>
+        <p>
+          Answer a few questions to discover which stress pattern you most
+          likely exhibit:
+        </p>
+
+        <div id="stress-quiz" class="quiz-container">
+          <div class="quiz-question active" data-question="1">
+            <h4>When do you typically feel most stressed during an exam?</h4>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="early">
+                Right at the beginning
+              </button>
+              <button class="quiz-option" data-value="middle">
+                Halfway through
+              </button>
+              <button class="quiz-option" data-value="late">
+                Near the end when time runs out
+              </button>
+              <button class="quiz-option" data-value="steady">
+                Consistently throughout
+              </button>
+            </div>
+          </div>
+
+          <div class="quiz-question" data-question="2">
+            <h4>How does your stress level change during the exam?</h4>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="spike">
+                Sharp spikes and drops
+              </button>
+              <button class="quiz-option" data-value="gradual">
+                Gradual increase
+              </button>
+              <button class="quiz-option" data-value="plateau">
+                Quick rise then stable
+              </button>
+              <button class="quiz-option" data-value="decline">
+                Starts high then decreases
+              </button>
+            </div>
+          </div>
+
+          <div class="quiz-question" data-question="3">
+            <h4>
+              How quickly do you recover after stressful moments during the
+              exam?
+            </h4>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="fast">
+                Very quickly (within minutes)
+              </button>
+              <button class="quiz-option" data-value="moderate">
+                Moderately (takes some time)
+              </button>
+              <button class="quiz-option" data-value="slow">
+                Slowly (stays elevated)
+              </button>
+              <button class="quiz-option" data-value="variable">
+                It varies
+              </button>
+            </div>
+          </div>
+
+          <div id="quiz-result" class="quiz-result">
+            <!-- Quiz result will appear here -->
+          </div>
+        </div>
       </div>
     </section>
 
