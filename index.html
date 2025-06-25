@@ -1,111 +1,764 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Exam Stress Visualization</title>
     <link rel="stylesheet" href="style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-</head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<body>
+  <body>
     <header class="hero">
-        <h1>Stress Signals: How Physiology Reflects Academic Pressure</h1>
-        <p class="subtitle">Explore how wearable data reveals student stress during exams</p>
-        <p class="authors">By Jessica Jiaxin, Neil Dewan, Alex Evans, Seiichi Nakahira</p>
+      <div class="language-switcher">
+        <button id="lang-en" class="lang-btn active" data-lang="en">
+          English
+        </button>
+        <button id="lang-ja" class="lang-btn" data-lang="ja">日本語</button>
+      </div>
+      <h1 data-i18n="header.title">
+        Stress Signals: How Physiology Reflects Academic Pressure
+      </h1>
+      <p class="subtitle" data-i18n="header.subtitle">
+        Explore how wearable data reveals student stress during exams
+      </p>
+      <p class="authors" data-i18n="header.authors">
+        By Jessica Jiaxin, Neil Dewan, Alex Evans, Seiichi Nakahira
+      </p>
     </header>
 
-    <section id="intro" class="section">
-        <h2>Project Overview</h2>
-        <p>In this project, we explore the relationship between academic stress and physiological responses by analyzing data from wearable sensors collected during midterm and final exams. Our goal is to uncover how cognitive pressure manifests in real
-            time through measurable signals such as heart rate (HR) and electrodermal activity (EDA). This work helps illustrate the invisible toll of academic pressure and offers insight into how stress varies by individual and context.</p>
+    <nav class="story-nav">
+      <button
+        class="nav-btn active"
+        data-section="overview"
+        data-i18n="nav.overview"
+      >
+        Overview
+      </button>
+      <button class="nav-btn" data-section="stories" data-i18n="nav.stories">
+        Student Stories
+      </button>
+      <button
+        class="nav-btn"
+        data-section="visualization"
+        data-i18n="nav.explorer"
+      >
+        Data Explorer
+      </button>
+      <button
+        class="nav-btn"
+        data-section="ml-analysis"
+        data-i18n="nav.patterns"
+      >
+        Pattern Discovery
+      </button>
+      <button class="nav-btn" data-section="insights" data-i18n="nav.insights">
+        Insights
+      </button>
+    </nav>
 
-        <p>Going into this, we expect there to be an optimum level of stress for exam performance. Obviously, if you're too stressed, you can't focus
-            properly on the exam and you'll do worse, but we also expect that if you go in not stressed at all, your brain won't be able to focus as well and won't see the proper 'threat' of the exam to trigger the correct signals to your body.
-            Because of this, we expect that there will be a level of stress inbetween that you can train your body to perform at, to increase your exam performance.
-        </p>
+    <section id="overview" class="section active">
+      <h2 data-i18n="overview.title">Project Overview</h2>
+      <p data-i18n="overview.description1">
+        In this project, we explore the relationship between academic stress and
+        physiological responses by analyzing data from wearable sensors
+        collected during midterm and final exams. Our goal is to uncover how
+        cognitive pressure manifests in real time through measurable signals
+        such as heart rate (HR) and electrodermal activity (EDA). This work
+        helps illustrate the invisible toll of academic pressure and offers
+        insight into how stress varies by individual and context.
+      </p>
+
+      <p data-i18n="overview.description2">
+        Going into this, we expect there to be an optimum level of stress for
+        exam performance. Obviously, if you're too stressed, you can't focus
+        properly on the exam and you'll do worse, but we also expect that if you
+        go in not stressed at all, your brain won't be able to focus as well and
+        won't see the proper 'threat' of the exam to trigger the correct signals
+        to your body. Because of this, we expect that there will be a level of
+        stress inbetween that you can train your body to perform at, to increase
+        your exam performance.
+      </p>
+
+      <div class="story-preview">
+        <h3 data-i18n="overview.featured">Featured Student Journeys</h3>
+        <div class="student-cards">
+          <div class="student-card" data-student="S03">
+            <div class="student-icon comeback">📈</div>
+            <h4 data-i18n="stories.comeback.title">The Comeback Story</h4>
+            <p data-i18n="stories.comeback.summary">
+              Student S03 turned their semester around
+            </p>
+            <div class="score-progression">77% → 90% → 94%</div>
+          </div>
+          <div class="student-card" data-student="S01">
+            <div class="student-icon steady">📊</div>
+            <h4 data-i18n="stories.steady.title">The Steady Climber</h4>
+            <p data-i18n="stories.steady.summary">
+              Student S01 showed consistent improvement
+            </p>
+            <div class="score-progression">78% → 82% → 91%</div>
+          </div>
+          <div class="student-card" data-student="S07">
+            <div class="student-icon struggle">📉</div>
+            <h4 data-i18n="stories.struggle.title">The Struggle Story</h4>
+            <p data-i18n="stories.struggle.summary">
+              Student S07 faced increasing challenges
+            </p>
+            <div class="score-progression">64% → 33% → 55%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stories" class="section">
+      <h2 data-i18n="stories.title">Student Journey Stories</h2>
+      <p class="section-intro" data-i18n="stories.intro">
+        Follow individual students through their semester journey. Each story
+        reveals how stress patterns correlate with academic performance and
+        personal resilience.
+      </p>
+
+      <div class="story-selector">
+        <button
+          class="story-btn active"
+          data-story="S03"
+          data-i18n="stories.comeback.title"
+        >
+          The Comeback Story
+        </button>
+        <button
+          class="story-btn"
+          data-story="S01"
+          data-i18n="stories.steady.title"
+        >
+          The Steady Climber
+        </button>
+        <button
+          class="story-btn"
+          data-story="S07"
+          data-i18n="stories.struggle.title"
+        >
+          The Struggle Story
+        </button>
+      </div>
+
+      <div id="story-content">
+        <!-- Story content will be dynamically loaded here -->
+      </div>
+
+      <div class="story-visualization">
+        <div id="student-timeline"></div>
+        <div id="student-stress-chart"></div>
+      </div>
     </section>
 
     <section id="visualization" class="section">
-        <h2>Interactive Visualizations</h2>
+      <h2 data-i18n="visualization.title">Interactive Data Explorer</h2>
+      <p class="section-intro" data-i18n="visualization.intro">
+        Dive deep into the data with our interactive visualizations. Compare
+        different students, exam types, and physiological signals.
+      </p>
 
-        <div class="chart-block">
-            <h3>Heart Rate Over Time</h3>
-            <p>This line chart shows the average heart rate of students during exams. Users can filter by gender group to observe trends across male and female students. The time axis spans a 3-hour exam window, and hovering reveals minute-level HR details.
-                Design choice: A line chart was chosen for its effectiveness in showing temporal trends, especially for identifying patterns such as pre-exam spikes or post-midpoint plateaus.</p>
-            <div class="controls">
-                <label for="hr-measure">Group:</label>
-                <select id="hr-measure"></select>
-            </div>
-            <div id="hr-chart"></div>
-            <div class="tooltip"></div>
+      <div class="chart-block">
+        <h3 data-i18n="visualization.hrChart.title">Heart Rate Over Time</h3>
+        <p data-i18n="visualization.hrChart.description">
+          This line chart shows the average heart rate of students during exams.
+          Users can filter by gender group to observe trends across male and
+          female students. The time axis spans a 3-hour exam window, and
+          hovering reveals minute-level HR details. Design choice: A line chart
+          was chosen for its effectiveness in showing temporal trends,
+          especially for identifying patterns such as pre-exam spikes or
+          post-midpoint plateaus.
+        </p>
+        <div class="controls">
+          <label for="hr-measure" data-i18n="visualization.hrChart.student"
+            >Student:</label
+          >
+          <select id="hr-measure"></select>
         </div>
+        <div id="hr-chart"></div>
+        <div class="tooltip"></div>
+      </div>
 
-
-        <div class="chart-block">
-            <h3>Signal Strength vs Exam Score</h3>
-            <p>This scatterplot correlates students' average physiological signal levels (e.g., EDA or HR) with their performance on exams. Users can switch between midterm and final data. Design choice: We used scatterplots to investigate possible trends
-                between stress indicators and outcomes, encouraging exploration of whether heightened physiological response relates to higher or lower academic performance.</p>
-            <p class="footnote">Exam Scores are in percentage. Both midterms were out of 100, but the final was 200 points and is normalized</p>
-            <div id="score-chart"></div>
-            <div class="tooltip"></div>
-        </div>
+      <div class="chart-block">
+        <h3 data-i18n="visualization.scoreChart.title">
+          Signal Strength vs Exam Score
+        </h3>
+        <p data-i18n="visualization.scoreChart.description">
+          This scatterplot correlates students' average physiological signal
+          levels (e.g., EDA or HR) with their performance on exams. Users can
+          switch between midterm and final data. Design choice: We used
+          scatterplots to investigate possible trends between stress indicators
+          and outcomes, encouraging exploration of whether heightened
+          physiological response relates to higher or lower academic
+          performance.
+        </p>
+        <p class="footnote" data-i18n="visualization.scoreChart.footnote">
+          Exam Scores are in percentage. Both midterms were out of 100, but the
+          final was 200 points and is normalized
+        </p>
+        <div id="score-chart"></div>
+        <div class="tooltip"></div>
+      </div>
     </section>
 
+    <section id="ml-analysis" class="section">
+      <h2 data-i18n="patterns.title">Stress Pattern Discovery</h2>
+      <p class="section-intro" data-i18n="patterns.intro">
+        Using machine learning to discover hidden patterns in how different
+        students experience stress during exams. Our clustering algorithm
+        identifies distinct "stress archetypes" based on physiological
+        responses.
+      </p>
+
+      <div class="algorithm-explainer">
+        <button id="toggle-algorithm" class="algorithm-toggle">
+          <span class="toggle-icon">📚</span>
+          <span class="toggle-text" data-i18n="patterns.algorithmToggle"
+            >How Does The Algorithm Work?</span
+          >
+          <span class="toggle-arrow">▼</span>
+        </button>
+
+        <div id="algorithm-explanation" class="algorithm-content">
+          <div class="explanation-grid">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <h4>Data Preparation</h4>
+              <p>
+                <strong>Input:</strong> Raw heart rate time series from wearable
+                sensors
+              </p>
+              <p>
+                <strong>Process:</strong> Extract meaningful features from each
+                student's exam session
+              </p>
+              <div class="code-example">
+                <strong>Features extracted:</strong><br />
+                • Peak Timing: When max HR occurs (0-1 scale)<br />
+                • Stress Build-up: HR change over time<br />
+                • Variability: Standard deviation of HR<br />
+                • Overall Trend: General increase/decrease
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <h4>Feature Engineering</h4>
+              <p>
+                <strong>Why these features?</strong> They capture different
+                aspects of stress response
+              </p>
+              <div class="feature-examples">
+                <div class="feature-item">
+                  <strong>Peak Timing = 0.2</strong> → Stress peaks early (20%
+                  through exam)
+                </div>
+                <div class="feature-item">
+                  <strong>High Variability</strong> → Lots of stress spikes and
+                  drops
+                </div>
+                <div class="feature-item">
+                  <strong>Positive Build-up</strong> → Stress increases over
+                  time
+                </div>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <h4>K-Means Clustering</h4>
+              <p>
+                <strong>Goal:</strong> Group similar stress patterns together
+              </p>
+              <div class="algorithm-steps">
+                <div class="mini-step">
+                  1. Place k random "centroids" in feature space
+                </div>
+                <div class="mini-step">
+                  2. Assign each student to nearest centroid
+                </div>
+                <div class="mini-step">
+                  3. Move centroids to center of their groups
+                </div>
+                <div class="mini-step">
+                  4. Repeat until centroids stop moving
+                </div>
+              </div>
+              <p class="math-note">
+                <em>Uses Euclidean distance in 4D feature space</em>
+              </p>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">4</div>
+              <h4>Archetype Classification</h4>
+              <p>
+                <strong>Challenge:</strong> Turn mathematical clusters into
+                meaningful categories
+              </p>
+              <div class="classification-rules">
+                <div class="rule-item">
+                  <strong>IF</strong> peak_timing < 0.3
+                  <strong>AND</strong> variability < 15<br />
+                  <strong>THEN</strong> "Early Spiker" 🚀
+                </div>
+                <div class="rule-item">
+                  <strong>IF</strong> peak_timing > 0.65<br />
+                  <strong>THEN</strong> "End Rusher" ⏰
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="technical-details">
+            <h4>🔧 Technical Implementation Details</h4>
+            <div class="tech-grid">
+              <div class="tech-item">
+                <strong>Algorithm:</strong> K-means clustering with k=3-5
+              </div>
+              <div class="tech-item">
+                <strong>Features:</strong> 4-dimensional normalized vectors
+              </div>
+              <div class="tech-item">
+                <strong>Distance Metric:</strong> Euclidean distance
+              </div>
+              <div class="tech-item">
+                <strong>Convergence:</strong> When centroids move < 0.001
+              </div>
+              <div class="tech-item">
+                <strong>Language:</strong> Client-side JavaScript
+              </div>
+              <div class="tech-item">
+                <strong>Libraries:</strong> D3.js for visualization
+              </div>
+            </div>
+          </div>
+
+          <div class="why-it-works">
+            <h4>🎯 Why This Approach Works</h4>
+            <div class="reason-cards">
+              <div class="reason-card">
+                <div class="reason-icon">🎯</div>
+                <h5>No Performance Dependency</h5>
+                <p>
+                  Clusters based on <em>how</em> students experience stress, not
+                  exam outcomes
+                </p>
+              </div>
+              <div class="reason-card">
+                <div class="reason-icon">⏱️</div>
+                <h5>Temporal Patterns</h5>
+                <p>
+                  Captures <em>when</em> stress occurs, revealing timing-based
+                  differences
+                </p>
+              </div>
+              <div class="reason-card">
+                <div class="reason-icon">🧬</div>
+                <h5>Physiological Basis</h5>
+                <p>
+                  Based on measurable biological responses, not self-reported
+                  data
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="limitations">
+            <h4>⚠️ Algorithm Limitations</h4>
+            <ul>
+              <li>
+                <strong>Cluster count:</strong> Must choose k beforehand (we
+                allow 3-5)
+              </li>
+              <li>
+                <strong>Feature selection:</strong> Results depend on which
+                features we extract
+              </li>
+              <li>
+                <strong>Interpretability:</strong> Mathematical clusters need
+                human interpretation
+              </li>
+              <li>
+                <strong>Sample size:</strong> Limited by number of student-exam
+                instances
+              </li>
+              <li>
+                <strong>Validation:</strong> No ground truth for "correct"
+                stress types
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ml-controls">
+        <div class="algorithm-info">
+          <h3>How It Works</h3>
+          <p>
+            We use <strong>K-means clustering</strong> to group students based
+            on their heart rate patterns during exams. The algorithm analyzes
+            temporal features like stress build-up rate, peak stress timing, and
+            recovery patterns.
+          </p>
+        </div>
+
+        <div class="analysis-controls">
+          <label for="cluster-count" data-i18n="patterns.clusterCount"
+            >Number of Stress Types:</label
+          >
+          <select id="cluster-count">
+            <option value="3">3 Types</option>
+            <option value="4" selected>4 Types</option>
+            <option value="5">5 Types</option>
+          </select>
+          <button
+            id="run-clustering"
+            class="ml-btn"
+            data-i18n="patterns.analyzeBtn"
+          >
+            🔄 Analyze Patterns
+          </button>
+        </div>
+      </div>
+
+      <div id="clustering-results" class="clustering-results">
+        <div class="results-header">
+          <h3 data-i18n="patterns.results.title">
+            Discovered Stress Archetypes
+          </h3>
+          <p data-i18n="patterns.results.subtitle">
+            Click on any archetype to explore the students who exhibit this
+            pattern:
+          </p>
+        </div>
+
+        <div id="archetype-cards" class="archetype-cards">
+          <!-- Archetype cards will be generated here -->
+        </div>
+
+        <div class="ml-visualizations">
+          <div class="viz-container">
+            <h4>Stress Pattern Comparison</h4>
+            <div id="pattern-comparison-chart"></div>
+          </div>
+
+          <div class="viz-container">
+            <h4>Student Distribution by Archetype</h4>
+            <div id="archetype-distribution-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="archetype-detail" class="archetype-detail">
+        <!-- Detailed archetype analysis will appear here -->
+      </div>
+
+      <div class="ml-insights">
+        <h3 data-i18n="patterns.insights.title">Key ML Insights</h3>
+        <div class="insight-grid">
+          <div class="ml-insight-card">
+            <div class="insight-icon">🔬</div>
+            <h4 data-i18n="patterns.insights.patterns">Pattern Discovery</h4>
+            <p data-i18n="patterns.insights.patternsDesc">
+              Machine learning revealed
+              <span id="ml-insight-patterns">4</span> distinct stress response
+              patterns that weren't obvious from individual analysis.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">⏱️</div>
+            <h4 data-i18n="patterns.insights.temporal">Temporal Features</h4>
+            <p data-i18n="patterns.insights.temporalDesc">
+              The strongest differentiating factor is
+              <strong>when</strong> during the exam stress peaks occur, not just
+              the intensity.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">👥</div>
+            <h4 data-i18n="patterns.insights.clustering">Student Clustering</h4>
+            <p data-i18n="patterns.insights.clusteringDesc">
+              Students with similar stress patterns often show different
+              performance outcomes, confirming stress doesn't predict grades.
+            </p>
+          </div>
+          <div class="ml-insight-card">
+            <div class="insight-icon">🎯</div>
+            <h4 data-i18n="patterns.insights.personalization">
+              Personalization
+            </h4>
+            <p data-i18n="patterns.insights.personalizationDesc">
+              Understanding your stress archetype could help develop
+              personalized stress management strategies.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ml-quiz">
+        <h3 data-i18n="patterns.quiz.title">
+          🎮 What's Your Stress Archetype?
+        </h3>
+        <p data-i18n="patterns.quiz.intro">
+          Answer a few questions to discover which stress pattern you most
+          likely exhibit:
+        </p>
+
+        <div id="stress-quiz" class="quiz-container">
+          <div class="quiz-question active" data-question="1">
+            <h4 data-i18n="patterns.quiz.question1">
+              When do you typically feel most stressed during an exam?
+            </h4>
+            <div class="quiz-options">
+              <button
+                class="quiz-option"
+                data-value="early"
+                data-i18n="patterns.quiz.q1Options.early"
+              >
+                Right at the beginning
+              </button>
+              <button
+                class="quiz-option"
+                data-value="middle"
+                data-i18n="patterns.quiz.q1Options.middle"
+              >
+                Halfway through
+              </button>
+              <button
+                class="quiz-option"
+                data-value="late"
+                data-i18n="patterns.quiz.q1Options.late"
+              >
+                Near the end when time runs out
+              </button>
+              <button
+                class="quiz-option"
+                data-value="steady"
+                data-i18n="patterns.quiz.q1Options.steady"
+              >
+                Consistently throughout
+              </button>
+            </div>
+          </div>
+
+          <div class="quiz-question" data-question="2">
+            <h4 data-i18n="patterns.quiz.question2">
+              How does your stress level change during the exam?
+            </h4>
+            <div class="quiz-options">
+              <button
+                class="quiz-option"
+                data-value="spike"
+                data-i18n="patterns.quiz.q2Options.spike"
+              >
+                Sharp spikes and drops
+              </button>
+              <button
+                class="quiz-option"
+                data-value="gradual"
+                data-i18n="patterns.quiz.q2Options.gradual"
+              >
+                Gradual increase
+              </button>
+              <button
+                class="quiz-option"
+                data-value="plateau"
+                data-i18n="patterns.quiz.q2Options.plateau"
+              >
+                Quick rise then stable
+              </button>
+              <button
+                class="quiz-option"
+                data-value="decline"
+                data-i18n="patterns.quiz.q2Options.decline"
+              >
+                Starts high then decreases
+              </button>
+            </div>
+          </div>
+
+          <div class="quiz-question" data-question="3">
+            <h4 data-i18n="patterns.quiz.question3">
+              How quickly do you recover after stressful moments during the
+              exam?
+            </h4>
+            <div class="quiz-options">
+              <button
+                class="quiz-option"
+                data-value="fast"
+                data-i18n="patterns.quiz.q3Options.fast"
+              >
+                Very quickly (within minutes)
+              </button>
+              <button
+                class="quiz-option"
+                data-value="moderate"
+                data-i18n="patterns.quiz.q3Options.moderate"
+              >
+                Moderately (takes some time)
+              </button>
+              <button
+                class="quiz-option"
+                data-value="slow"
+                data-i18n="patterns.quiz.q3Options.slow"
+              >
+                Slowly (stays elevated)
+              </button>
+              <button
+                class="quiz-option"
+                data-value="variable"
+                data-i18n="patterns.quiz.q3Options.variable"
+              >
+                It varies
+              </button>
+            </div>
+          </div>
+
+          <div id="quiz-result" class="quiz-result">
+            <!-- Quiz result will appear here -->
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section id="insights" class="section">
-        <h2>What We Learned</h2>
-        <ul>
-            <li>Heart rate typically spikes near the end of exams, likely reflecting time pressure or final effort.</li>
-            <li>Female students demonstrated more variability in EDA during finals, suggesting different stress coping mechanisms.</li>
-            <li>Physiological responses varied more by individual than by exam type, emphasizing personal stress thresholds.</li>
-            <li>But the main takeaway from all this is that there's very little correlation between stress levels and exam results, meaning that unfortunately there is no easy way to get ahead on your exams. You're stuck studying hard if you want to do well</li>
-        </ul>
+      <h2 data-i18n="insights.title">What We Learned</h2>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-icon">💓</div>
+          <h3 data-i18n="insights.heartRate.title">Heart Rate Patterns</h3>
+          <p data-i18n="insights.heartRate.description">
+            Heart rate typically spikes near the end of exams, likely reflecting
+            time pressure or final effort. Some students show consistent
+            patterns across all exams.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon">⚡</div>
+          <h3 data-i18n="insights.stressVariability.title">
+            Stress Variability
+          </h3>
+          <p data-i18n="insights.stressVariability.description">
+            Female students demonstrated more variability in EDA during finals,
+            suggesting different stress coping mechanisms between genders.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon">🎯</div>
+          <h3 data-i18n="insights.individualDifferences.title">
+            Individual Differences
+          </h3>
+          <p data-i18n="insights.individualDifferences.description">
+            Physiological responses varied more by individual than by exam type,
+            emphasizing personal stress thresholds and coping strategies.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon">📚</div>
+          <h3 data-i18n="insights.realityCheck.title">The Reality Check</h3>
+          <p data-i18n="insights.realityCheck.description">
+            There's very little correlation between stress levels and exam
+            results, meaning unfortunately there is no easy way to get ahead on
+            your exams. You're stuck studying hard if you want to do well!
+          </p>
+        </div>
+      </div>
     </section>
-
 
     <section id="methods" class="section">
-        <h2>Dataset & Methodology</h2>
-        <p>We used the publicly available <a href="https://physionet.org/content/wearable-exam-stress/1.0.0/" target="_blank">Wearable Exam Stress Dataset</a> from PhysioNet, which includes continuous recordings of heart rate (HR) and electrodermal activity
-            (EDA) collected during real university exams.</p>
-        <p><strong>Data processing steps included:</strong></p>
-        <ul>
-            <li>Resampling data for consistent time intervals</li>
-            <li>Converting timestamps to relative exam time</li>
-            <li>Grouping by student and exam type</li>
-            <li>Calculating averages and ranges for visualization</li>
-        </ul>
-        <p>All preprocessing was done in Python using Pandas and NumPy. The visualizations were developed with D3.js to support interactivity and dynamic exploration.</p>
+      <h2 data-i18n="methods.title">Dataset & Methodology</h2>
+      <p data-i18n="methods.description">
+        We used the publicly available
+        <a
+          href="https://physionet.org/content/wearable-exam-stress/1.0.0/"
+          target="_blank"
+          >Wearable Exam Stress Dataset</a
+        >
+        from PhysioNet, which includes continuous recordings of heart rate (HR)
+        and electrodermal activity (EDA) collected during real university exams.
+      </p>
+      <p>
+        <strong data-i18n="methods.steps"
+          >Data processing steps included:</strong
+        >
+      </p>
+      <ul>
+        <li data-i18n="methods.stepList.0">
+          Resampling data for consistent time intervals
+        </li>
+        <li data-i18n="methods.stepList.1">
+          Converting timestamps to relative exam time
+        </li>
+        <li data-i18n="methods.stepList.2">
+          Grouping by student and exam type
+        </li>
+        <li data-i18n="methods.stepList.3">
+          Calculating averages and ranges for visualization
+        </li>
+      </ul>
+      <p data-i18n="methods.tools">
+        All preprocessing was done in Python using Pandas and NumPy. The
+        visualizations were developed with D3.js to support interactivity and
+        dynamic exploration.
+      </p>
     </section>
-
 
     <section id="limitations" class="section">
-        <h2>Limitations & Considerations</h2>
-        <ul>
-            <li>The dataset lacks baseline readings outside of exams, making it difficult to compare to “normal” physiological states.</li>
-            <li>Movement artifacts or environmental factors (e.g., room temperature) may influence signal accuracy.</li>
-            <li>Sample size and demographic variety are limited, so generalizations should be made cautiously.</li>
-        </ul>
+      <h2 data-i18n="limitations.title">Limitations & Considerations</h2>
+      <ul>
+        <li data-i18n="limitations.list.0">
+          The dataset lacks baseline readings outside of exams, making it
+          difficult to compare to "normal" physiological states.
+        </li>
+        <li data-i18n="limitations.list.1">
+          Movement artifacts or environmental factors (e.g., room temperature)
+          may influence signal accuracy.
+        </li>
+        <li data-i18n="limitations.list.2">
+          Sample size and demographic variety are limited, so generalizations
+          should be made cautiously.
+        </li>
+      </ul>
     </section>
-
 
     <section id="team" class="section">
-        <h2>About the Team</h2>
-        <p>We are a group of students passionate about data storytelling. This project was built collaboratively as part of our final visualization course assignment.</p>
+      <h2 data-i18n="team.title">About the Team</h2>
+      <p data-i18n="team.description">
+        We are a group of students passionate about data storytelling. This
+        project was built collaboratively as part of our final visualization
+        course assignment.
+      </p>
     </section>
 
-
     <footer class="footer">
-        <p>© 2025 | Team Jessica Jiaxin He • <a href="https://github.com/hjxhh030315?tab=repositories">GitHub Repo</a></p>
-        <p>© 2025 | Team Neil Dewan • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
-        <p>© 2025 | Team Alex Evans • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
-        <p>© 2025 | Team Seiichi Nakahira • <a href="https://github.com/your-repo-link">GitHub Repo</a></p>
+      <p>
+        © 2025 | Team Jessica Jiaxin He •
+        <a href="https://github.com/hjxhh030315?tab=repositories"
+          >GitHub Repo</a
+        >
+      </p>
+      <p>
+        © 2025 | Team Neil Dewan •
+        <a href="https://github.com/your-repo-link">GitHub Repo</a>
+      </p>
+      <p>
+        © 2025 | Team Alex Evans •
+        <a href="https://github.com/your-repo-link">GitHub Repo</a>
+      </p>
+      <p>
+        © 2025 | Team Seiichi Nakahira •
+        <a href="https://github.com/your-repo-link">GitHub Repo</a>
+      </p>
     </footer>
 
-
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="translations.js"></script>
     <script src="script.js"></script>
-</body>
-
+  </body>
 </html>
