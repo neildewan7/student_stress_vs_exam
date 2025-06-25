@@ -1,6 +1,8 @@
 // Global data storage
 let hrData = [];
 let scoresData = [];
+let mlData = [];
+let clusteringResults = null;
 
 // Student story data
 const studentStories = {
@@ -155,6 +157,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Load visualization data
   loadVisualizationData();
+
+  // Initialize ML functionality
+  initializeMLAnalysis();
 });
 
 function loadStudentStory(studentId) {
@@ -168,7 +173,7 @@ function loadStudentStory(studentId) {
             <p class="story-subtitle">${story.subtitle}</p>
             <p>${story.description}</p>
         </div>
-        
+
         <div class="story-timeline">
             ${story.timeline
               .map(
@@ -183,7 +188,7 @@ function loadStudentStory(studentId) {
               )
               .join("")}
         </div>
-        
+
         <div class="story-analysis">
             <h4 style="margin-bottom: 15px; color: #333;">Analysis</h4>
             <p style="margin-bottom: 15px;">${story.analysis}</p>
@@ -760,4 +765,712 @@ function initializeScoreChart() {
   d3.selectAll("#exam-checkboxes input").on("change", updateScoreChart);
 
   updateScoreChart();
+}
+
+// ML Analysis Functions
+function initializeMLAnalysis() {
+  // Set up ML controls
+  document
+    .getElementById("run-clustering")
+    .addEventListener("click", runClusteringAnalysis);
+  document
+    .getElementById("cluster-count")
+    .addEventListener("change", runClusteringAnalysis);
+
+  // Initialize quiz
+  initializeStressQuiz();
+
+  // Load initial clustering
+  setTimeout(() => {
+    if (hrData.length > 0) {
+      runClusteringAnalysis();
+    }
+  }, 1000);
+}
+
+function runClusteringAnalysis() {
+  const clusterCount = parseInt(document.getElementById("cluster-count").value);
+
+  // Prepare data for clustering
+  const features = prepareMLFeatures();
+
+  // Run K-means clustering
+  clusteringResults = performKMeansClustering(features, clusterCount);
+
+  // Display results
+  displayClusteringResults(clusteringResults);
+
+  // Update insights
+  updateMLInsights(clusteringResults);
+}
+
+function prepareMLFeatures() {
+  // Extract features from heart rate data for each student
+  const studentFeatures = {};
+
+  hrData.forEach((d) => {
+    if (!studentFeatures[d.student]) {
+      studentFeatures[d.student] = {
+        student: d.student,
+        exams: {},
+      };
+    }
+
+    if (!studentFeatures[d.student].exams[d.exam]) {
+      studentFeatures[d.student].exams[d.exam] = [];
+    }
+
+    studentFeatures[d.student].exams[d.exam].push({
+      minute: d.minute,
+      hr: d.mean,
+    });
+  });
+
+  // Calculate features for each student
+  const features = [];
+  Object.keys(studentFeatures).forEach((studentId) => {
+    const studentData = studentFeatures[studentId];
+    Object.keys(studentData.exams).forEach((exam) => {
+      const examData = studentData.exams[exam];
+      if (examData.length > 10) {
+        // Ensure enough data points
+        const feature = calculateStressFeatures(examData, studentId, exam);
+        features.push(feature);
+      }
+    });
+  });
+
+  return features;
+}
+
+function calculateStressFeatures(examData, studentId, exam) {
+  // Sort by minute
+  examData.sort((a, b) => a.minute - b.minute);
+
+  const hrValues = examData.map((d) => d.hr);
+  const minutes = examData.map((d) => d.minute);
+
+  // Calculate various stress pattern features
+  const meanHR = hrValues.reduce((a, b) => a + b, 0) / hrValues.length;
+  const maxHR = Math.max(...hrValues);
+  const minHR = Math.min(...hrValues);
+  const hrRange = maxHR - minHR;
+
+  // Find peak timing (when max HR occurs)
+  const maxHRIndex = hrValues.indexOf(maxHR);
+  const peakTiming = minutes[maxHRIndex];
+  const examDuration = Math.max(...minutes);
+  const normalizedPeakTiming = peakTiming / examDuration;
+
+  // Calculate stress build-up rate (early vs late stress)
+  const firstQuarter = examData.slice(0, Math.floor(examData.length / 4));
+  const lastQuarter = examData.slice(-Math.floor(examData.length / 4));
+  const earlyStress =
+    firstQuarter.reduce((a, b) => a + b.hr, 0) / firstQuarter.length;
+  const lateStress =
+    lastQuarter.reduce((a, b) => a + b.hr, 0) / lastQuarter.length;
+  const stressBuildUp = lateStress - earlyStress;
+
+  // Calculate variability (standard deviation)
+  const variance =
+    hrValues.reduce((acc, val) => acc + Math.pow(val - meanHR, 2), 0) /
+    hrValues.length;
+  const stdDev = Math.sqrt(variance);
+
+  // Calculate trend (overall increase/decrease)
+  const firstHalf = examData.slice(0, Math.floor(examData.length / 2));
+  const secondHalf = examData.slice(Math.floor(examData.length / 2));
+  const firstHalfMean =
+    firstHalf.reduce((a, b) => a + b.hr, 0) / firstHalf.length;
+  const secondHalfMean =
+    secondHalf.reduce((a, b) => a + b.hr, 0) / secondHalf.length;
+  const overallTrend = secondHalfMean - firstHalfMean;
+
+  return {
+    student: studentId,
+    exam: exam,
+    meanHR: meanHR,
+    maxHR: maxHR,
+    hrRange: hrRange,
+    normalizedPeakTiming: normalizedPeakTiming,
+    stressBuildUp: stressBuildUp,
+    variability: stdDev,
+    overallTrend: overallTrend,
+    rawData: examData,
+  };
+}
+
+function performKMeansClustering(features, k) {
+  // Extract feature vectors for clustering
+  const featureVectors = features.map((f) => [
+    f.normalizedPeakTiming,
+    f.stressBuildUp / 100, // Normalize
+    f.variability / 100, // Normalize
+    f.overallTrend / 100, // Normalize
+  ]);
+
+  // Simple K-means implementation
+  const clusters = kMeans(featureVectors, k);
+
+  // Assign cluster labels to original features
+  features.forEach((feature, index) => {
+    feature.cluster = clusters.assignments[index];
+  });
+
+  // Analyze clusters to create archetypes
+  const archetypes = analyzeClusterArchetypes(features, clusters);
+
+  return {
+    features: features,
+    clusters: clusters,
+    archetypes: archetypes,
+  };
+}
+
+function kMeans(data, k, maxIterations = 100) {
+  const n = data.length;
+  const dimensions = data[0].length;
+
+  // Initialize centroids randomly
+  let centroids = [];
+  for (let i = 0; i < k; i++) {
+    centroids.push(data[Math.floor(Math.random() * n)].slice());
+  }
+
+  let assignments = new Array(n);
+  let converged = false;
+  let iterations = 0;
+
+  while (!converged && iterations < maxIterations) {
+    // Assign points to nearest centroid
+    for (let i = 0; i < n; i++) {
+      let minDistance = Infinity;
+      let closestCentroid = 0;
+
+      for (let j = 0; j < k; j++) {
+        const distance = euclideanDistance(data[i], centroids[j]);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestCentroid = j;
+        }
+      }
+      assignments[i] = closestCentroid;
+    }
+
+    // Update centroids
+    const newCentroids = [];
+    for (let i = 0; i < k; i++) {
+      const clusterPoints = data.filter((_, index) => assignments[index] === i);
+      if (clusterPoints.length > 0) {
+        const centroid = new Array(dimensions).fill(0);
+        clusterPoints.forEach((point) => {
+          point.forEach((value, dim) => {
+            centroid[dim] += value;
+          });
+        });
+        centroid.forEach((_, dim) => {
+          centroid[dim] /= clusterPoints.length;
+        });
+        newCentroids.push(centroid);
+      } else {
+        newCentroids.push(centroids[i]);
+      }
+    }
+
+    // Check for convergence
+    converged = true;
+    for (let i = 0; i < k; i++) {
+      if (euclideanDistance(centroids[i], newCentroids[i]) > 0.001) {
+        converged = false;
+        break;
+      }
+    }
+
+    centroids = newCentroids;
+    iterations++;
+  }
+
+  return {
+    centroids: centroids,
+    assignments: assignments,
+    iterations: iterations,
+  };
+}
+
+function euclideanDistance(a, b) {
+  return Math.sqrt(a.reduce((sum, val, i) => sum + Math.pow(val - b[i], 2), 0));
+}
+
+function analyzeClusterArchetypes(features, clusters) {
+  const archetypes = [];
+  const k = clusters.centroids.length;
+
+  const archetypeTemplates = [
+    {
+      name: "Early Spiker",
+      icon: "🚀",
+      description: "Stress peaks early and then stabilizes",
+    },
+    {
+      name: "Gradual Builder",
+      icon: "📈",
+      description: "Stress increases steadily throughout the exam",
+    },
+    {
+      name: "End Rusher",
+      icon: "⏰",
+      description: "Stress spikes dramatically near the end",
+    },
+    {
+      name: "Steady State",
+      icon: "📊",
+      description: "Maintains consistent stress levels",
+    },
+    {
+      name: "Volatile Responder",
+      icon: "⚡",
+      description: "High variability with frequent stress spikes",
+    },
+  ];
+
+  for (let i = 0; i < k; i++) {
+    const clusterFeatures = features.filter((f) => f.cluster === i);
+
+    if (clusterFeatures.length === 0) continue;
+
+    // Calculate cluster characteristics
+    const avgPeakTiming =
+      clusterFeatures.reduce((sum, f) => sum + f.normalizedPeakTiming, 0) /
+      clusterFeatures.length;
+    const avgStressBuildUp =
+      clusterFeatures.reduce((sum, f) => sum + f.stressBuildUp, 0) /
+      clusterFeatures.length;
+    const avgVariability =
+      clusterFeatures.reduce((sum, f) => sum + f.variability, 0) /
+      clusterFeatures.length;
+    const avgTrend =
+      clusterFeatures.reduce((sum, f) => sum + f.overallTrend, 0) /
+      clusterFeatures.length;
+
+    // Determine archetype based on characteristics
+    let archetypeName, icon, description;
+
+    if (avgPeakTiming < 0.3 && avgVariability < 15) {
+      archetypeName = "Early Spiker";
+      icon = "🚀";
+      description =
+        "Stress peaks early in the exam then stabilizes. Often indicates initial anxiety that settles once the exam begins.";
+    } else if (avgStressBuildUp > 10 && avgTrend > 0) {
+      archetypeName = "Gradual Builder";
+      icon = "📈";
+      description =
+        "Stress increases steadily throughout the exam. May indicate growing pressure from time constraints.";
+    } else if (avgPeakTiming > 0.7) {
+      archetypeName = "End Rusher";
+      icon = "⏰";
+      description =
+        "Stress spikes dramatically near the end. Often related to time pressure and rushing to finish.";
+    } else if (avgVariability > 20) {
+      archetypeName = "Volatile Responder";
+      icon = "⚡";
+      description =
+        "High variability with frequent stress spikes. May indicate difficulty maintaining consistent focus.";
+    } else {
+      archetypeName = "Steady State";
+      icon = "📊";
+      description =
+        "Maintains relatively consistent stress levels throughout. Shows good stress management and focus.";
+    }
+
+    archetypes.push({
+      id: i,
+      name: archetypeName,
+      icon: icon,
+      description: description,
+      students: clusterFeatures,
+      characteristics: {
+        avgPeakTiming: avgPeakTiming,
+        avgStressBuildUp: avgStressBuildUp,
+        avgVariability: avgVariability,
+        avgTrend: avgTrend,
+      },
+    });
+  }
+
+  return archetypes;
+}
+
+function displayClusteringResults(results) {
+  const archetypeCardsContainer = document.getElementById("archetype-cards");
+  archetypeCardsContainer.innerHTML = "";
+
+  results.archetypes.forEach((archetype) => {
+    const card = document.createElement("div");
+    card.className = "archetype-card";
+    card.dataset.archetypeId = archetype.id;
+
+    card.innerHTML = `
+            <div class="archetype-icon">${archetype.icon}</div>
+            <div class="archetype-title">${archetype.name}</div>
+            <div class="archetype-description">${archetype.description}</div>
+            <div class="archetype-count">${archetype.students.length} instances</div>
+        `;
+
+    card.addEventListener("click", () => {
+      document
+        .querySelectorAll(".archetype-card")
+        .forEach((c) => c.classList.remove("selected"));
+      card.classList.add("selected");
+      showArchetypeDetail(archetype);
+    });
+
+    archetypeCardsContainer.appendChild(card);
+  });
+
+  // Create visualizations
+  createPatternComparisonChart(results);
+  createArchetypeDistributionChart(results);
+
+  // Auto-select first archetype
+  if (results.archetypes.length > 0) {
+    setTimeout(() => {
+      archetypeCardsContainer.firstChild.click();
+    }, 500);
+  }
+}
+
+function showArchetypeDetail(archetype) {
+  const detailContainer = document.getElementById("archetype-detail");
+
+  detailContainer.innerHTML = `
+        <h3>${archetype.icon} ${archetype.name} - Detailed Analysis</h3>
+        <p>${archetype.description}</p>
+
+        <div class="archetype-stats">
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value">${(archetype.characteristics.avgPeakTiming * 100).toFixed(0)}%</div>
+                    <div class="stat-label">Average Peak Timing</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${archetype.characteristics.avgVariability.toFixed(1)}</div>
+                    <div class="stat-label">Stress Variability</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${archetype.characteristics.avgStressBuildUp.toFixed(1)}</div>
+                    <div class="stat-label">Stress Build-up</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${archetype.students.length}</div>
+                    <div class="stat-label">Student Instances</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="example-students">
+            <h4>Example Students:</h4>
+            <div class="student-list">
+                ${archetype.students
+                  .slice(0, 6)
+                  .map(
+                    (student) =>
+                      `<span class="student-tag">${student.student} (${student.exam})</span>`,
+                  )
+                  .join("")}
+                ${archetype.students.length > 6 ? `<span class="student-tag">+${archetype.students.length - 6} more</span>` : ""}
+            </div>
+        </div>
+
+        <div id="archetype-pattern-chart"></div>
+    `;
+
+  detailContainer.classList.add("active");
+
+  // Create detailed pattern chart for this archetype
+  createArchetypePatternChart(archetype);
+}
+
+function createPatternComparisonChart(results) {
+  const container = document.getElementById("pattern-comparison-chart");
+  container.innerHTML = "";
+
+  const margin = { top: 20, right: 30, bottom: 40, left: 80 };
+  const width = 400 - margin.left - margin.right;
+  const height = 300 - margin.top - margin.bottom;
+
+  const svg = d3
+    .select(container)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Prepare data for radar chart
+  const features = [
+    "Peak Timing",
+    "Stress Build-up",
+    "Variability",
+    "Overall Trend",
+  ];
+  const data = results.archetypes.map((archetype) => ({
+    name: archetype.name,
+    values: [
+      archetype.characteristics.avgPeakTiming,
+      Math.max(0, Math.min(1, archetype.characteristics.avgStressBuildUp / 50)),
+      Math.max(0, Math.min(1, archetype.characteristics.avgVariability / 30)),
+      Math.max(0, Math.min(1, (archetype.characteristics.avgTrend + 25) / 50)),
+    ],
+  }));
+
+  // Create simple bar chart instead of radar for simplicity
+  const y = d3
+    .scaleBand()
+    .domain(results.archetypes.map((a) => a.name))
+    .range([0, height])
+    .padding(0.1);
+
+  const x = d3.scaleLinear().domain([0, 1]).range([0, width]);
+
+  const color = d3
+    .scaleOrdinal()
+    .domain(results.archetypes.map((a) => a.name))
+    .range(d3.schemeCategory10);
+
+  // Add axes
+  svg.append("g").call(d3.axisLeft(y));
+
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(5));
+
+  // Add bars for peak timing
+  svg
+    .selectAll(".bar")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", 0)
+    .attr("y", (d) => y(d.name))
+    .attr("width", (d) => x(d.values[0]))
+    .attr("height", y.bandwidth())
+    .attr("fill", (d) => color(d.name))
+    .attr("opacity", 0.7);
+}
+
+function createArchetypeDistributionChart(results) {
+  const container = document.getElementById("archetype-distribution-chart");
+  container.innerHTML = "";
+
+  const width = 400;
+  const height = 300;
+  const radius = Math.min(width, height) / 2 - 20;
+
+  const svg = d3
+    .select(container)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${width / 2},${height / 2})`);
+
+  const pie = d3.pie().value((d) => d.count);
+
+  const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+  const color = d3
+    .scaleOrdinal()
+    .domain(results.archetypes.map((a) => a.name))
+    .range(d3.schemeCategory10);
+
+  const data = results.archetypes.map((archetype) => ({
+    name: archetype.name,
+    count: archetype.students.length,
+  }));
+
+  const arcs = svg
+    .selectAll(".arc")
+    .data(pie(data))
+    .enter()
+    .append("g")
+    .attr("class", "arc");
+
+  arcs
+    .append("path")
+    .attr("d", arc)
+    .attr("fill", (d) => color(d.data.name))
+    .attr("opacity", 0.8);
+
+  arcs
+    .append("text")
+    .attr("transform", (d) => `translate(${arc.centroid(d)})`)
+    .attr("text-anchor", "middle")
+    .style("font-size", "12px")
+    .style("font-weight", "600")
+    .text((d) => (d.data.count > 2 ? d.data.name : ""));
+}
+
+function createArchetypePatternChart(archetype) {
+  const container = document.getElementById("archetype-pattern-chart");
+  container.innerHTML = "";
+
+  const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+  const width = 600 - margin.left - margin.right;
+  const height = 300 - margin.top - margin.bottom;
+
+  const svg = d3
+    .select(container)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Show average pattern for this archetype
+  const exampleStudent = archetype.students[0];
+  if (!exampleStudent || !exampleStudent.rawData) return;
+
+  const data = exampleStudent.rawData;
+
+  const x = d3
+    .scaleLinear()
+    .domain(d3.extent(data, (d) => d.minute))
+    .range([0, width]);
+
+  const y = d3
+    .scaleLinear()
+    .domain(d3.extent(data, (d) => d.hr))
+    .range([height, 0]);
+
+  const line = d3
+    .line()
+    .x((d) => x(d.minute))
+    .y((d) => y(d.hr))
+    .curve(d3.curveMonotoneX);
+
+  // Add axes
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x));
+
+  svg.append("g").call(d3.axisLeft(y));
+
+  // Add line
+  svg
+    .append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "#3c6ca4")
+    .attr("stroke-width", 2)
+    .attr("d", line);
+
+  // Add title
+  svg
+    .append("text")
+    .attr("x", width / 2)
+    .attr("y", -5)
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("font-weight", "600")
+    .text(
+      `Example Pattern: ${exampleStudent.student} - ${exampleStudent.exam}`,
+    );
+}
+
+function updateMLInsights(results) {
+  document.getElementById("ml-insight-patterns").textContent =
+    results.archetypes.length;
+}
+
+// Stress Quiz Functions
+function initializeStressQuiz() {
+  let currentQuestion = 1;
+  let answers = {};
+
+  document.querySelectorAll(".quiz-option").forEach((option) => {
+    option.addEventListener("click", function () {
+      const question = this.closest(".quiz-question");
+      const questionNum = question.dataset.question;
+
+      // Clear previous selections
+      question
+        .querySelectorAll(".quiz-option")
+        .forEach((opt) => opt.classList.remove("selected"));
+      this.classList.add("selected");
+
+      // Store answer
+      answers[questionNum] = this.dataset.value;
+
+      // Move to next question or show result
+      setTimeout(() => {
+        const nextQuestion = parseInt(questionNum) + 1;
+        if (nextQuestion <= 3) {
+          question.classList.remove("active");
+          document
+            .querySelector(`[data-question="${nextQuestion}"]`)
+            .classList.add("active");
+        } else {
+          // Show result
+          question.classList.remove("active");
+          showQuizResult(answers);
+        }
+      }, 500);
+    });
+  });
+}
+
+function showQuizResult(answers) {
+  const resultContainer = document.getElementById("quiz-result");
+
+  // Simple algorithm to determine stress type based on answers
+  let stressType = "Steady State";
+  let icon = "📊";
+  let description = "You likely maintain consistent stress levels.";
+
+  if (answers["1"] === "early" && answers["2"] === "spike") {
+    stressType = "Early Spiker";
+    icon = "🚀";
+    description =
+      "You tend to experience high stress at the beginning of exams that then stabilizes.";
+  } else if (answers["1"] === "late" && answers["2"] === "gradual") {
+    stressType = "End Rusher";
+    icon = "⏰";
+    description =
+      "You build up stress throughout the exam, especially under time pressure.";
+  } else if (answers["2"] === "gradual" && answers["3"] === "slow") {
+    stressType = "Gradual Builder";
+    icon = "📈";
+    description =
+      "Your stress increases steadily and you take time to recover from stressful moments.";
+  } else if (answers["2"] === "spike" && answers["3"] === "variable") {
+    stressType = "Volatile Responder";
+    icon = "⚡";
+    description =
+      "You experience frequent stress spikes with variable recovery patterns.";
+  }
+
+  resultContainer.innerHTML = `
+        <div class="quiz-result-icon">${icon}</div>
+        <h4>Your Stress Archetype: ${stressType}</h4>
+        <p>${description}</p>
+        <div style="margin-top: 20px;">
+            <button onclick="resetQuiz()" class="ml-btn">Take Quiz Again</button>
+        </div>
+    `;
+
+  resultContainer.classList.add("active");
+}
+
+function resetQuiz() {
+  document.getElementById("quiz-result").classList.remove("active");
+  document
+    .querySelectorAll(".quiz-question")
+    .forEach((q) => q.classList.remove("active"));
+  document
+    .querySelectorAll(".quiz-option")
+    .forEach((opt) => opt.classList.remove("selected"));
+  document.querySelector('[data-question="1"]').classList.add("active");
 }
