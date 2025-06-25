@@ -229,6 +229,7 @@ function createStudentTimeline(studentId) {
     .style("font-weight", "600")
     .text(`${studentId} - Score Progression Over Time`);
 
+  const studentStories = getStudentStories();
   const story = studentStories[studentId];
   if (!story) return;
 
@@ -320,6 +321,7 @@ function createStudentStressChart(studentId) {
     .style("font-weight", "600")
     .text(`${studentId} - Stress Level Progression`);
 
+  const studentStories = getStudentStories();
   const story = studentStories[studentId];
   if (!story) return;
 
@@ -1100,7 +1102,7 @@ function analyzeClusterArchetypes(features, clusters) {
         archetypeName = usedNames.has("Volatile Responder")
           ? "Stress Fluctuator"
           : "Volatile Responder";
-        icon = usedNames.has("Volatile Responder") ? "🌊" : "⚡";
+        icon = usedNames.has("Volatile Responder") ? "🌊" : "��";
         description =
           archetypeName === "Stress Fluctuator"
             ? "Shows irregular stress patterns with unpredictable fluctuations."
@@ -1526,40 +1528,37 @@ function initializeStressQuiz() {
 
 function showQuizResult(answers) {
   const resultContainer = document.getElementById("quiz-result");
+  const t = translations[currentLanguage];
 
   // Simple algorithm to determine stress type based on answers
-  let stressType = "Steady State";
+  let stressType = t.patterns.archetypes.steadyState.name;
   let icon = "📊";
-  let description = "You likely maintain consistent stress levels.";
+  let description = t.patterns.archetypes.steadyState.description;
 
   if (answers["1"] === "early" && answers["2"] === "spike") {
-    stressType = "Early Spiker";
+    stressType = t.patterns.archetypes.earlySpiker.name;
     icon = "🚀";
-    description =
-      "You tend to experience high stress at the beginning of exams that then stabilizes.";
+    description = t.patterns.archetypes.earlySpiker.description;
   } else if (answers["1"] === "late" && answers["2"] === "gradual") {
-    stressType = "End Rusher";
+    stressType = t.patterns.archetypes.endRusher.name;
     icon = "⏰";
-    description =
-      "You build up stress throughout the exam, especially under time pressure.";
+    description = t.patterns.archetypes.endRusher.description;
   } else if (answers["2"] === "gradual" && answers["3"] === "slow") {
-    stressType = "Gradual Builder";
+    stressType = t.patterns.archetypes.gradualBuilder.name;
     icon = "📈";
-    description =
-      "Your stress increases steadily and you take time to recover from stressful moments.";
+    description = t.patterns.archetypes.gradualBuilder.description;
   } else if (answers["2"] === "spike" && answers["3"] === "variable") {
-    stressType = "Volatile Responder";
+    stressType = t.patterns.archetypes.volatileResponder.name;
     icon = "⚡";
-    description =
-      "You experience frequent stress spikes with variable recovery patterns.";
+    description = t.patterns.archetypes.volatileResponder.description;
   }
 
   resultContainer.innerHTML = `
         <div class="quiz-result-icon">${icon}</div>
-        <h4>Your Stress Archetype: ${stressType}</h4>
+        <h4>${getTranslation("patterns.quiz.result")}: ${stressType}</h4>
         <p>${description}</p>
         <div style="margin-top: 20px;">
-            <button onclick="resetQuiz()" class="ml-btn">Take Quiz Again</button>
+            <button onclick="resetQuiz()" class="ml-btn">${getTranslation("patterns.quiz.retakeBtn")}</button>
         </div>
     `;
 
