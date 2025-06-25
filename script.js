@@ -1004,34 +1004,7 @@ function euclideanDistance(a, b) {
 function analyzeClusterArchetypes(features, clusters) {
   const archetypes = [];
   const k = clusters.centroids.length;
-
-  const archetypeTemplates = [
-    {
-      name: "Early Spiker",
-      icon: "🚀",
-      description: "Stress peaks early and then stabilizes",
-    },
-    {
-      name: "Gradual Builder",
-      icon: "📈",
-      description: "Stress increases steadily throughout the exam",
-    },
-    {
-      name: "End Rusher",
-      icon: "⏰",
-      description: "Stress spikes dramatically near the end",
-    },
-    {
-      name: "Steady State",
-      icon: "📊",
-      description: "Maintains consistent stress levels",
-    },
-    {
-      name: "Volatile Responder",
-      icon: "⚡",
-      description: "High variability with frequent stress spikes",
-    },
-  ];
+  const usedNames = new Set(); // Track used archetype names
 
   for (let i = 0; i < k; i++) {
     const clusterFeatures = features.filter((f) => f.cluster === i);
@@ -1052,35 +1025,106 @@ function analyzeClusterArchetypes(features, clusters) {
       clusterFeatures.reduce((sum, f) => sum + f.overallTrend, 0) /
       clusterFeatures.length;
 
-    // Determine archetype based on characteristics
+    // Determine archetype based on characteristics with unique naming
     let archetypeName, icon, description;
 
-    if (avgPeakTiming < 0.3 && avgVariability < 15) {
+    // Use a scoring system to determine the best archetype
+    const scores = {
+      earlySpiker: avgPeakTiming < 0.3 && avgVariability < 15 ? 3 : 0,
+      gradualBuilder: avgStressBuildUp > 5 && avgTrend > 5 ? 3 : 0,
+      endRusher: avgPeakTiming > 0.65 ? 3 : 0,
+      volatileResponder: avgVariability > 15 ? 2 : 0,
+      steadyState: Math.abs(avgTrend) < 5 && avgVariability < 12 ? 2 : 0,
+    };
+
+    // Add secondary characteristics for more nuanced classification
+    if (avgPeakTiming > 0.4 && avgPeakTiming < 0.65) scores.gradualBuilder += 1;
+    if (avgVariability > 10 && avgVariability < 20)
+      scores.volatileResponder += 1;
+    if (avgStressBuildUp < -5) scores.earlySpiker += 1;
+
+    // Find the highest scoring archetype
+    const topArchetype = Object.keys(scores).reduce((a, b) =>
+      scores[a] > scores[b] ? a : b,
+    );
+
+    // Assign unique names based on top archetype and cluster characteristics
+    if (topArchetype === "earlySpiker" && !usedNames.has("Early Spiker")) {
       archetypeName = "Early Spiker";
       icon = "🚀";
       description =
         "Stress peaks early in the exam then stabilizes. Often indicates initial anxiety that settles once the exam begins.";
-    } else if (avgStressBuildUp > 10 && avgTrend > 0) {
+    } else if (
+      topArchetype === "gradualBuilder" &&
+      !usedNames.has("Gradual Builder")
+    ) {
       archetypeName = "Gradual Builder";
       icon = "📈";
       description =
         "Stress increases steadily throughout the exam. May indicate growing pressure from time constraints.";
-    } else if (avgPeakTiming > 0.7) {
+    } else if (topArchetype === "endRusher" && !usedNames.has("End Rusher")) {
       archetypeName = "End Rusher";
       icon = "⏰";
       description =
         "Stress spikes dramatically near the end. Often related to time pressure and rushing to finish.";
-    } else if (avgVariability > 20) {
+    } else if (
+      topArchetype === "volatileResponder" &&
+      !usedNames.has("Volatile Responder")
+    ) {
       archetypeName = "Volatile Responder";
       icon = "⚡";
       description =
         "High variability with frequent stress spikes. May indicate difficulty maintaining consistent focus.";
-    } else {
+    } else if (
+      topArchetype === "steadyState" &&
+      !usedNames.has("Steady State")
+    ) {
       archetypeName = "Steady State";
       icon = "📊";
       description =
         "Maintains relatively consistent stress levels throughout. Shows good stress management and focus.";
+    } else {
+      // Create unique variants for duplicate archetypes
+      if (avgPeakTiming < 0.4) {
+        archetypeName = usedNames.has("Early Spiker")
+          ? "Quick Adapter"
+          : "Early Spiker";
+        icon = usedNames.has("Early Spiker") ? "🎯" : "🚀";
+        description =
+          archetypeName === "Quick Adapter"
+            ? "Adapts quickly to exam conditions with minimal sustained stress."
+            : "Stress peaks early in the exam then stabilizes. Often indicates initial anxiety that settles once the exam begins.";
+      } else if (avgPeakTiming > 0.6) {
+        archetypeName = usedNames.has("End Rusher")
+          ? "Time Pressured"
+          : "End Rusher";
+        icon = usedNames.has("End Rusher") ? "⏳" : "⏰";
+        description =
+          archetypeName === "Time Pressured"
+            ? "Experiences mounting pressure as exam time runs out."
+            : "Stress spikes dramatically near the end. Often related to time pressure and rushing to finish.";
+      } else if (avgVariability > 15) {
+        archetypeName = usedNames.has("Volatile Responder")
+          ? "Stress Fluctuator"
+          : "Volatile Responder";
+        icon = usedNames.has("Volatile Responder") ? "🌊" : "⚡";
+        description =
+          archetypeName === "Stress Fluctuator"
+            ? "Shows irregular stress patterns with unpredictable fluctuations."
+            : "High variability with frequent stress spikes. May indicate difficulty maintaining consistent focus.";
+      } else {
+        archetypeName = usedNames.has("Steady State")
+          ? "Consistent Performer"
+          : "Steady State";
+        icon = usedNames.has("Steady State") ? "⚖️" : "📊";
+        description =
+          archetypeName === "Consistent Performer"
+            ? "Maintains balanced and controlled stress responses throughout exams."
+            : "Maintains relatively consistent stress levels throughout. Shows good stress management and focus.";
+      }
     }
+
+    usedNames.add(archetypeName);
 
     archetypes.push({
       id: i,
