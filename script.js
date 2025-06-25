@@ -1194,9 +1194,9 @@ function createPatternComparisonChart(results) {
   const container = document.getElementById("pattern-comparison-chart");
   container.innerHTML = "";
 
-  const margin = { top: 20, right: 30, bottom: 40, left: 80 };
-  const width = 400 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
+  const margin = { top: 20, right: 30, bottom: 40, left: 140 }; // Increased left margin
+  const width = 450 - margin.left - margin.right;
+  const height = 350 - margin.top - margin.bottom;
 
   const svg = d3
     .select(container)
@@ -1206,46 +1206,57 @@ function createPatternComparisonChart(results) {
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Prepare data for radar chart
-  const features = [
-    "Peak Timing",
-    "Stress Build-up",
-    "Variability",
-    "Overall Trend",
-  ];
+  // Prepare data for the chart
   const data = results.archetypes.map((archetype) => ({
     name: archetype.name,
-    values: [
-      archetype.characteristics.avgPeakTiming,
-      Math.max(0, Math.min(1, archetype.characteristics.avgStressBuildUp / 50)),
-      Math.max(0, Math.min(1, archetype.characteristics.avgVariability / 30)),
-      Math.max(0, Math.min(1, (archetype.characteristics.avgTrend + 25) / 50)),
-    ],
+    peakTiming: archetype.characteristics.avgPeakTiming,
+    displayName:
+      archetype.name.length > 15
+        ? archetype.name.substring(0, 12) + "..."
+        : archetype.name,
   }));
 
-  // Create simple bar chart instead of radar for simplicity
+  // Create scales
   const y = d3
     .scaleBand()
-    .domain(results.archetypes.map((a) => a.name))
+    .domain(data.map((d) => d.name))
     .range([0, height])
-    .padding(0.1);
+    .padding(0.2);
 
   const x = d3.scaleLinear().domain([0, 1]).range([0, width]);
 
   const color = d3
     .scaleOrdinal()
     .domain(results.archetypes.map((a) => a.name))
-    .range(d3.schemeCategory10);
+    .range(["#3c6ca4", "#5a88d1", "#8bb3e8", "#b8d4f2", "#e8f4fd"]);
 
-  // Add axes
-  svg.append("g").call(d3.axisLeft(y));
+  // Add axes with custom formatting
+  const yAxis = svg.append("g").call(
+    d3.axisLeft(y).tickFormat((d) => {
+      // Custom formatting for long names
+      const archetype = data.find((item) => item.name === d);
+      return archetype ? archetype.displayName : d;
+    }),
+  );
+
+  // Style y-axis text
+  yAxis
+    .selectAll("text")
+    .style("font-size", "11px")
+    .style("font-weight", "600")
+    .style("fill", "#333");
 
   svg
     .append("g")
     .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x).ticks(5));
+    .call(
+      d3
+        .axisBottom(x)
+        .ticks(5)
+        .tickFormat((d) => `${(d * 100).toFixed(0)}%`),
+    );
 
-  // Add bars for peak timing
+  // Add bars
   svg
     .selectAll(".bar")
     .data(data)
@@ -1254,19 +1265,46 @@ function createPatternComparisonChart(results) {
     .attr("class", "bar")
     .attr("x", 0)
     .attr("y", (d) => y(d.name))
-    .attr("width", (d) => x(d.values[0]))
+    .attr("width", (d) => x(d.peakTiming))
     .attr("height", y.bandwidth())
     .attr("fill", (d) => color(d.name))
-    .attr("opacity", 0.7);
+    .attr("opacity", 0.8)
+    .attr("rx", 4); // Rounded corners
+
+  // Add value labels on bars
+  svg
+    .selectAll(".bar-label")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("class", "bar-label")
+    .attr("x", (d) => x(d.peakTiming) + 5)
+    .attr("y", (d) => y(d.name) + y.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .style("font-size", "10px")
+    .style("font-weight", "600")
+    .style("fill", "#333")
+    .text((d) => `${(d.peakTiming * 100).toFixed(0)}%`);
+
+  // Add chart title
+  svg
+    .append("text")
+    .attr("x", width / 2)
+    .attr("y", -5)
+    .attr("text-anchor", "middle")
+    .style("font-size", "12px")
+    .style("font-weight", "600")
+    .style("fill", "#333")
+    .text("Average Peak Timing (% through exam)");
 }
 
 function createArchetypeDistributionChart(results) {
   const container = document.getElementById("archetype-distribution-chart");
   container.innerHTML = "";
 
-  const width = 400;
-  const height = 300;
-  const radius = Math.min(width, height) / 2 - 20;
+  const width = 450;
+  const height = 350;
+  const radius = Math.min(width, height) / 2 - 60; // More margin for labels
 
   const svg = d3
     .select(container)
@@ -1276,14 +1314,22 @@ function createArchetypeDistributionChart(results) {
     .append("g")
     .attr("transform", `translate(${width / 2},${height / 2})`);
 
-  const pie = d3.pie().value((d) => d.count);
+  const pie = d3
+    .pie()
+    .value((d) => d.count)
+    .sort(null);
 
   const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+  const labelArc = d3
+    .arc()
+    .innerRadius(radius + 15)
+    .outerRadius(radius + 15);
 
   const color = d3
     .scaleOrdinal()
     .domain(results.archetypes.map((a) => a.name))
-    .range(d3.schemeCategory10);
+    .range(["#3c6ca4", "#5a88d1", "#8bb3e8", "#b8d4f2", "#e8f4fd"]);
 
   const data = results.archetypes.map((archetype) => ({
     name: archetype.name,
@@ -1301,15 +1347,34 @@ function createArchetypeDistributionChart(results) {
     .append("path")
     .attr("d", arc)
     .attr("fill", (d) => color(d.data.name))
-    .attr("opacity", 0.8);
+    .attr("opacity", 0.9)
+    .attr("stroke", "white")
+    .attr("stroke-width", 2);
 
+  // Add lines from pie slices to labels
+  arcs
+    .append("polyline")
+    .attr("points", (d) => {
+      const centroid = arc.centroid(d);
+      const labelPos = labelArc.centroid(d);
+      return [centroid, labelPos];
+    })
+    .style("fill", "none")
+    .style("stroke", "#666")
+    .style("stroke-width", 1);
+
+  // Add labels outside the pie
   arcs
     .append("text")
-    .attr("transform", (d) => `translate(${arc.centroid(d)})`)
-    .attr("text-anchor", "middle")
-    .style("font-size", "12px")
+    .attr("transform", (d) => `translate(${labelArc.centroid(d)})`)
+    .attr("text-anchor", (d) => {
+      const centroid = labelArc.centroid(d);
+      return centroid[0] > 0 ? "start" : "end";
+    })
+    .style("font-size", "11px")
     .style("font-weight", "600")
-    .text((d) => (d.data.count > 2 ? d.data.name : ""));
+    .style("fill", "#333")
+    .text((d) => `${d.data.name} (${d.data.count})`);
 }
 
 function createArchetypePatternChart(archetype) {
