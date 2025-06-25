@@ -13,30 +13,56 @@
 
   <body>
     <header class="hero">
-      <h1>Stress Signals: How Physiology Reflects Academic Pressure</h1>
-      <p class="subtitle">
+      <div class="language-switcher">
+        <button id="lang-en" class="lang-btn active" data-lang="en">
+          English
+        </button>
+        <button id="lang-ja" class="lang-btn" data-lang="ja">日本語</button>
+      </div>
+      <h1 data-i18n="header.title">
+        Stress Signals: How Physiology Reflects Academic Pressure
+      </h1>
+      <p class="subtitle" data-i18n="header.subtitle">
         Explore how wearable data reveals student stress during exams
       </p>
-      <p class="authors">
+      <p class="authors" data-i18n="header.authors">
         By Jessica Jiaxin, Neil Dewan, Alex Evans, Seiichi Nakahira
       </p>
     </header>
 
     <nav class="story-nav">
-      <button class="nav-btn active" data-section="overview">Overview</button>
-      <button class="nav-btn" data-section="stories">Student Stories</button>
-      <button class="nav-btn" data-section="visualization">
+      <button
+        class="nav-btn active"
+        data-section="overview"
+        data-i18n="nav.overview"
+      >
+        Overview
+      </button>
+      <button class="nav-btn" data-section="stories" data-i18n="nav.stories">
+        Student Stories
+      </button>
+      <button
+        class="nav-btn"
+        data-section="visualization"
+        data-i18n="nav.explorer"
+      >
         Data Explorer
       </button>
-      <button class="nav-btn" data-section="ml-analysis">
+      <button
+        class="nav-btn"
+        data-section="ml-analysis"
+        data-i18n="nav.patterns"
+      >
         🔬 Pattern Discovery
       </button>
-      <button class="nav-btn" data-section="insights">Insights</button>
+      <button class="nav-btn" data-section="insights" data-i18n="nav.insights">
+        Insights
+      </button>
     </nav>
 
     <section id="overview" class="section active">
-      <h2>Project Overview</h2>
-      <p>
+      <h2 data-i18n="overview.title">Project Overview</h2>
+      <p data-i18n="overview.description1">
         In this project, we explore the relationship between academic stress and
         physiological responses by analyzing data from wearable sensors
         collected during midterm and final exams. Our goal is to uncover how
@@ -46,7 +72,7 @@
         insight into how stress varies by individual and context.
       </p>
 
-      <p>
+      <p data-i18n="overview.description2">
         Going into this, we expect there to be an optimum level of stress for
         exam performance. Obviously, if you're too stressed, you can't focus
         properly on the exam and you'll do worse, but we also expect that if you
@@ -58,24 +84,30 @@
       </p>
 
       <div class="story-preview">
-        <h3>Featured Student Journeys</h3>
+        <h3 data-i18n="overview.featured">Featured Student Journeys</h3>
         <div class="student-cards">
           <div class="student-card" data-student="S03">
             <div class="student-icon comeback">📈</div>
-            <h4>The Comeback Story</h4>
-            <p>Student S03 turned their semester around</p>
+            <h4 data-i18n="stories.comeback.title">The Comeback Story</h4>
+            <p data-i18n="stories.comeback.summary">
+              Student S03 turned their semester around
+            </p>
             <div class="score-progression">77% → 90% → 94%</div>
           </div>
           <div class="student-card" data-student="S01">
             <div class="student-icon steady">📊</div>
-            <h4>The Steady Climber</h4>
-            <p>Student S01 showed consistent improvement</p>
+            <h4 data-i18n="stories.steady.title">The Steady Climber</h4>
+            <p data-i18n="stories.steady.summary">
+              Student S01 showed consistent improvement
+            </p>
             <div class="score-progression">78% → 82% → 91%</div>
           </div>
           <div class="student-card" data-student="S07">
             <div class="student-icon struggle">📉</div>
-            <h4>The Struggle Story</h4>
-            <p>Student S07 faced increasing challenges</p>
+            <h4 data-i18n="stories.struggle.title">The Struggle Story</h4>
+            <p data-i18n="stories.struggle.summary">
+              Student S07 faced increasing challenges
+            </p>
             <div class="score-progression">64% → 33% → 55%</div>
           </div>
         </div>
@@ -624,6 +656,7 @@
     </footer>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="translations.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

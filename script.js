@@ -4,110 +4,96 @@ let scoresData = [];
 let mlData = [];
 let clusteringResults = null;
 
-// Student story data
-const studentStories = {
-  S03: {
-    title: "The Comeback Story",
-    subtitle: "From struggle to excellence through stress management",
-    description:
-      "Student S03 shows us that initial struggles don't define final outcomes. Starting with a challenging first midterm, they developed better stress management techniques that led to remarkable improvement.",
-    timeline: [
-      {
-        exam: "Midterm 1",
-        score: 77,
-        stress: "High",
-        description: "High stress levels impacted initial performance",
-      },
-      {
-        exam: "Midterm 2",
-        score: 90,
-        stress: "Moderate",
-        description: "Learned to manage stress better, significant improvement",
-      },
-      {
-        exam: "Final",
-        score: 94,
-        stress: "Low",
-        description: "Optimal stress level achieved, excellent performance",
-      },
-    ],
-    analysis:
-      "This student's journey demonstrates the importance of stress management. As their stress levels decreased from exam to exam, their performance dramatically improved. The final exam shows nearly optimal stress levels correlating with their best performance.",
-    insights: [
-      "Stress decreased progressively: High → Moderate → Low",
-      "Performance improved steadily: 77% → 90% → 94%",
-      "Final exam showed optimal stress-performance balance",
-    ],
-  },
-  S01: {
-    title: "The Steady Climber",
-    subtitle: "Consistent improvement through methodical preparation",
-    description:
-      "Student S01 exemplifies steady, consistent improvement. Their approach shows how methodical preparation and consistent stress levels can lead to gradual but reliable academic growth.",
-    timeline: [
-      {
-        exam: "Midterm 1",
-        score: 78,
-        stress: "Moderate",
-        description: "Solid baseline performance with manageable stress",
-      },
-      {
-        exam: "Midterm 2",
-        score: 82,
-        stress: "Moderate",
-        description: "Steady improvement with consistent stress management",
-      },
-      {
-        exam: "Final",
-        score: 91,
-        stress: "Low",
-        description: "Excellent final performance with reduced stress",
-      },
-    ],
-    analysis:
-      "This student shows the power of consistency. Rather than dramatic swings, they maintained steady stress levels while gradually improving their performance through each exam cycle.",
-    insights: [
-      "Maintained consistent moderate stress levels",
-      "Showed steady improvement: 78% → 82% → 91%",
-      "Demonstrates the value of consistent preparation",
-    ],
-  },
-  S07: {
-    title: "The Struggle Story",
-    subtitle: "When stress becomes overwhelming",
-    description:
-      "Student S07's journey illustrates how escalating stress can impact academic performance. This story highlights the importance of recognizing when stress becomes counterproductive.",
-    timeline: [
-      {
-        exam: "Midterm 1",
-        score: 64,
-        stress: "Moderate",
-        description:
-          "Started with manageable stress but below-average performance",
-      },
-      {
-        exam: "Midterm 2",
-        score: 33,
-        stress: "Very High",
-        description:
-          "Stress levels spiked dramatically, performance declined severely",
-      },
-      {
-        exam: "Final",
-        score: 55,
-        stress: "High",
-        description: "Partial recovery but stress remained elevated",
-      },
-    ],
-    analysis:
-      "This case study shows how unmanaged stress can create a negative feedback loop. The dramatic spike in stress during Midterm 2 corresponded with the worst performance, and while there was some recovery for the final, elevated stress levels persisted.",
-    insights: [
-      "Stress escalated from Moderate → Very High → High",
-      "Performance declined then partially recovered: 64% → 33% → 55%",
-      "Shows the negative impact of unmanaged stress",
-    ],
-  },
-};
+// Get student story data with current language
+function getStudentStories() {
+  const t = translations[currentLanguage];
+  return {
+    S03: {
+      title: t.stories.comeback.title,
+      subtitle: t.stories.comeback.subtitle,
+      description: t.stories.comeback.description,
+      timeline: [
+        {
+          exam: t.stories.examLabels.midterm1,
+          score: 77,
+          stress: t.stories.stressLevels.high,
+          description: "High stress levels impacted initial performance",
+        },
+        {
+          exam: t.stories.examLabels.midterm2,
+          score: 90,
+          stress: t.stories.stressLevels.moderate,
+          description:
+            "Learned to manage stress better, significant improvement",
+        },
+        {
+          exam: t.stories.examLabels.final,
+          score: 94,
+          stress: t.stories.stressLevels.low,
+          description: "Optimal stress level achieved, excellent performance",
+        },
+      ],
+      analysis: t.stories.comeback.analysis,
+      insights: t.stories.comeback.insights,
+    },
+    S01: {
+      title: t.stories.steady.title,
+      subtitle: t.stories.steady.subtitle,
+      description: t.stories.steady.description,
+      timeline: [
+        {
+          exam: t.stories.examLabels.midterm1,
+          score: 78,
+          stress: t.stories.stressLevels.moderate,
+          description: "Solid baseline performance with manageable stress",
+        },
+        {
+          exam: t.stories.examLabels.midterm2,
+          score: 82,
+          stress: t.stories.stressLevels.moderate,
+          description: "Steady improvement with consistent stress management",
+        },
+        {
+          exam: t.stories.examLabels.final,
+          score: 91,
+          stress: t.stories.stressLevels.low,
+          description: "Excellent final performance with reduced stress",
+        },
+      ],
+      analysis: t.stories.steady.analysis,
+      insights: t.stories.steady.insights,
+    },
+    S07: {
+      title: t.stories.struggle.title,
+      subtitle: t.stories.struggle.subtitle,
+      description: t.stories.struggle.description,
+      timeline: [
+        {
+          exam: t.stories.examLabels.midterm1,
+          score: 64,
+          stress: t.stories.stressLevels.moderate,
+          description:
+            "Started with manageable stress but below-average performance",
+        },
+        {
+          exam: t.stories.examLabels.midterm2,
+          score: 33,
+          stress: t.stories.stressLevels.veryHigh,
+          description:
+            "Stress levels spiked dramatically, performance declined severely",
+        },
+        {
+          exam: t.stories.examLabels.final,
+          score: 55,
+          stress: t.stories.stressLevels.high,
+          description: "Partial recovery but stress remained elevated",
+        },
+      ],
+      analysis: t.stories.struggle.analysis,
+      insights: t.stories.struggle.insights,
+    },
+  };
+}
 
 // Navigation functionality
 document.addEventListener("DOMContentLoaded", function () {
@@ -163,9 +149,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize algorithm explainer toggle
   initializeAlgorithmToggle();
+
+  // Initialize internationalization
+  initializeI18n();
 });
 
 function loadStudentStory(studentId) {
+  const studentStories = getStudentStories();
   const story = studentStories[studentId];
   if (!story) return;
 
