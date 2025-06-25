@@ -28,7 +28,9 @@
       <button class="nav-btn" data-section="visualization">
         Data Explorer
       </button>
-      <button class="nav-btn" data-section="ml-analysis">🤖 ML Analysis</button>
+      <button class="nav-btn" data-section="ml-analysis">
+        🔬 Pattern Discovery
+      </button>
       <button class="nav-btn" data-section="insights">Insights</button>
     </nav>
 
@@ -153,13 +155,193 @@
     </section>
 
     <section id="ml-analysis" class="section">
-      <h2>🤖 AI-Powered Stress Pattern Analysis</h2>
+      <h2>🔬 Stress Pattern Discovery</h2>
       <p class="section-intro">
         Using machine learning to discover hidden patterns in how different
         students experience stress during exams. Our clustering algorithm
         identifies distinct "stress archetypes" based on physiological
         responses.
       </p>
+
+      <div class="algorithm-explainer">
+        <button id="toggle-algorithm" class="algorithm-toggle">
+          <span class="toggle-icon">📚</span>
+          <span class="toggle-text">How Does The Algorithm Work?</span>
+          <span class="toggle-arrow">▼</span>
+        </button>
+
+        <div id="algorithm-explanation" class="algorithm-content">
+          <div class="explanation-grid">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <h4>Data Preparation</h4>
+              <p>
+                <strong>Input:</strong> Raw heart rate time series from wearable
+                sensors
+              </p>
+              <p>
+                <strong>Process:</strong> Extract meaningful features from each
+                student's exam session
+              </p>
+              <div class="code-example">
+                <strong>Features extracted:</strong><br />
+                • Peak Timing: When max HR occurs (0-1 scale)<br />
+                • Stress Build-up: HR change over time<br />
+                • Variability: Standard deviation of HR<br />
+                • Overall Trend: General increase/decrease
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <h4>Feature Engineering</h4>
+              <p>
+                <strong>Why these features?</strong> They capture different
+                aspects of stress response
+              </p>
+              <div class="feature-examples">
+                <div class="feature-item">
+                  <strong>Peak Timing = 0.2</strong> → Stress peaks early (20%
+                  through exam)
+                </div>
+                <div class="feature-item">
+                  <strong>High Variability</strong> → Lots of stress spikes and
+                  drops
+                </div>
+                <div class="feature-item">
+                  <strong>Positive Build-up</strong> → Stress increases over
+                  time
+                </div>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <h4>K-Means Clustering</h4>
+              <p>
+                <strong>Goal:</strong> Group similar stress patterns together
+              </p>
+              <div class="algorithm-steps">
+                <div class="mini-step">
+                  1. Place k random "centroids" in feature space
+                </div>
+                <div class="mini-step">
+                  2. Assign each student to nearest centroid
+                </div>
+                <div class="mini-step">
+                  3. Move centroids to center of their groups
+                </div>
+                <div class="mini-step">
+                  4. Repeat until centroids stop moving
+                </div>
+              </div>
+              <p class="math-note">
+                <em>Uses Euclidean distance in 4D feature space</em>
+              </p>
+            </div>
+
+            <div class="step-card">
+              <div class="step-number">4</div>
+              <h4>Archetype Classification</h4>
+              <p>
+                <strong>Challenge:</strong> Turn mathematical clusters into
+                meaningful categories
+              </p>
+              <div class="classification-rules">
+                <div class="rule-item">
+                  <strong>IF</strong> peak_timing < 0.3
+                  <strong>AND</strong> variability < 15<br />
+                  <strong>THEN</strong> "Early Spiker" 🚀
+                </div>
+                <div class="rule-item">
+                  <strong>IF</strong> peak_timing > 0.65<br />
+                  <strong>THEN</strong> "End Rusher" ⏰
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="technical-details">
+            <h4>🔧 Technical Implementation Details</h4>
+            <div class="tech-grid">
+              <div class="tech-item">
+                <strong>Algorithm:</strong> K-means clustering with k=3-5
+              </div>
+              <div class="tech-item">
+                <strong>Features:</strong> 4-dimensional normalized vectors
+              </div>
+              <div class="tech-item">
+                <strong>Distance Metric:</strong> Euclidean distance
+              </div>
+              <div class="tech-item">
+                <strong>Convergence:</strong> When centroids move < 0.001
+              </div>
+              <div class="tech-item">
+                <strong>Language:</strong> Client-side JavaScript
+              </div>
+              <div class="tech-item">
+                <strong>Libraries:</strong> D3.js for visualization
+              </div>
+            </div>
+          </div>
+
+          <div class="why-it-works">
+            <h4>🎯 Why This Approach Works</h4>
+            <div class="reason-cards">
+              <div class="reason-card">
+                <div class="reason-icon">🎯</div>
+                <h5>No Performance Dependency</h5>
+                <p>
+                  Clusters based on <em>how</em> students experience stress, not
+                  exam outcomes
+                </p>
+              </div>
+              <div class="reason-card">
+                <div class="reason-icon">⏱️</div>
+                <h5>Temporal Patterns</h5>
+                <p>
+                  Captures <em>when</em> stress occurs, revealing timing-based
+                  differences
+                </p>
+              </div>
+              <div class="reason-card">
+                <div class="reason-icon">🧬</div>
+                <h5>Physiological Basis</h5>
+                <p>
+                  Based on measurable biological responses, not self-reported
+                  data
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="limitations">
+            <h4>⚠️ Algorithm Limitations</h4>
+            <ul>
+              <li>
+                <strong>Cluster count:</strong> Must choose k beforehand (we
+                allow 3-5)
+              </li>
+              <li>
+                <strong>Feature selection:</strong> Results depend on which
+                features we extract
+              </li>
+              <li>
+                <strong>Interpretability:</strong> Mathematical clusters need
+                human interpretation
+              </li>
+              <li>
+                <strong>Sample size:</strong> Limited by number of student-exam
+                instances
+              </li>
+              <li>
+                <strong>Validation:</strong> No ground truth for "correct"
+                stress types
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="ml-controls">
         <div class="algorithm-info">

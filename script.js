@@ -160,6 +160,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize ML functionality
   initializeMLAnalysis();
+
+  // Initialize algorithm explainer toggle
+  initializeAlgorithmToggle();
 });
 
 function loadStudentStory(studentId) {
@@ -1582,4 +1585,29 @@ function resetQuiz() {
     .querySelectorAll(".quiz-option")
     .forEach((opt) => opt.classList.remove("selected"));
   document.querySelector('[data-question="1"]').classList.add("active");
+}
+
+// Algorithm Explainer Functions
+function initializeAlgorithmToggle() {
+  const toggleButton = document.getElementById("toggle-algorithm");
+  const content = document.getElementById("algorithm-explanation");
+  const arrow = toggleButton.querySelector(".toggle-arrow");
+
+  if (!toggleButton || !content) return;
+
+  toggleButton.addEventListener("click", () => {
+    const isActive = content.classList.contains("active");
+
+    if (isActive) {
+      content.classList.remove("active");
+      arrow.classList.remove("rotated");
+      toggleButton.querySelector(".toggle-text").textContent =
+        "How Does The Algorithm Work?";
+    } else {
+      content.classList.add("active");
+      arrow.classList.add("rotated");
+      toggleButton.querySelector(".toggle-text").textContent =
+        "Hide Algorithm Explanation";
+    }
+  });
 }
