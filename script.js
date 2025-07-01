@@ -1485,10 +1485,7 @@ function createArchetypePatternChart(archetype) {
 }
 
 function updateMLInsights(results) {
-  document.getElementById("ml-insight-patterns").textContent =
-    results.archetypes.length;
-
-  // Update the insights description with current language
+  // Update the insights description with current language and pattern count
   const patternsDescElement = document.querySelector(
     '[data-i18n="patterns.insights.patternsDesc"]',
   );
@@ -1500,6 +1497,14 @@ function updateMLInsights(results) {
         `<span id="ml-insight-patterns">${results.archetypes.length}</span>`,
       );
     }
+  }
+
+  // Also update the standalone element if it exists
+  const mlInsightPatternsElement = document.getElementById(
+    "ml-insight-patterns",
+  );
+  if (mlInsightPatternsElement) {
+    mlInsightPatternsElement.textContent = results.archetypes.length;
   }
 }
 
